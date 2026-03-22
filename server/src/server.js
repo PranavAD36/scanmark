@@ -52,7 +52,7 @@ function createServer() {
 
   app.use(cors(corsOptions))
   // Ensure preflight requests succeed across all routes
-  app.options('*', cors(corsOptions))
+  app.options(/.*/, cors(corsOptions))
 
   app.use(morgan('dev'))
 
