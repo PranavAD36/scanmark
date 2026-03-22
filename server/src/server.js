@@ -21,15 +21,38 @@ function createServer() {
   const app = express()
   app.use(express.json({ limit: '1mb' }))
 
-  const clientOrigin = process.env.CLIENT_ORIGIN || 'http://localhost:5173'
-  app.use(
-    cors({
-      origin: clientOrigin,
-      credentials: true,
-      allowedHeaders: ['Content-Type', 'Authorization'],
-      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    }),
-  )
+  const defaultAllowedOrigins = [
+    'http://localhost:5173',
+    'https://scanmark-sage.vercel.app',
+  ]
+
+  const envAllowedOrigins = String(process.env.CLIENT_ORIGIN || '')
+    .split(',')
+    .map((value) => value.trim())
+    .filter(Boolean)
+
+  const allowedOrigins = new Set([...defaultAllowedOrigins, ...envAllowedOrigins])
+
+  const corsOptions = {
+    origin: (origin, callback) => {
+      // Allow same-origin/non-browser requests (curl, server-to-server, health checks)
+      if (!origin) return callback(null, true)
+
+      if (allowedOrigins.has(origin)) return callback(null, true)
+
+      const err = new Error('Not allowed by CORS')
+      err.status = 403
+      return callback(err)
+    },
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    optionsSuccessStatus: 204,
+  }
+
+  app.use(cors(corsOptions))
+  // Ensure preflight requests succeed across all routes
+  app.options('*', cors(corsOptions))
 
   app.use(morgan('dev'))
 
