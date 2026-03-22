@@ -53,7 +53,7 @@ async function dashboard(req, res, next) {
 
     const allSubjectIds = Array.from(new Set((subjRows || []).map((r) => r.subject_id)))
 
-    const { data: totalSessions, error: totalError } = await admin
+    const { count: totalSessionsCount, error: totalError } = await admin
       .from('sessions')
       .select('id', { count: 'exact', head: true })
       .eq('status', 'ended')
@@ -61,9 +61,9 @@ async function dashboard(req, res, next) {
 
     if (totalError) return respondSupabaseError(res, totalError)
 
-    const total = totalSessions.count || 0
+    const total = totalSessionsCount || 0
 
-    const { data: presentSessions, error: presentError } = await admin
+    const { count: presentSessionsCount, error: presentError } = await admin
       .from('attendance')
       .select('id', { count: 'exact', head: true })
       .eq('student_user_id', req.profile.id)
@@ -71,7 +71,7 @@ async function dashboard(req, res, next) {
 
     if (presentError) return respondSupabaseError(res, presentError)
 
-    const present = presentSessions.count || 0
+    const present = presentSessionsCount || 0
     const overallPercent = total > 0 ? Math.round((present / total) * 100) : 0
 
     return res.json({ todayPresent, todayAbsent, overallPercent })

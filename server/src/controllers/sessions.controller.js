@@ -33,6 +33,25 @@ async function start(req, res, next) {
       return res.status(403).json({ error: 'Subject not assigned to this faculty' })
     }
 
+    // If an active (non-expired) session already exists for this faculty+subject,
+    // return it instead of creating duplicates (common after refresh).
+    const now = nowIso()
+    const { data: existingSession, error: existingError } = await admin
+      .from('sessions')
+      .select('id, subject_id, faculty_user_id, starts_at, ends_at, status')
+      .eq('faculty_user_id', req.profile.id)
+      .eq('subject_id', body.subjectId)
+      .eq('status', 'active')
+      .gt('ends_at', now)
+      .order('starts_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    if (existingError) return respondSupabaseError(res, existingError)
+    if (existingSession) {
+      return res.json({ session: existingSession })
+    }
+
     const startsAt = new Date()
     const endsAt = new Date(startsAt.getTime() + 15 * 60 * 1000)
 
@@ -122,11 +141,17 @@ async function end(req, res, next) {
       .eq('id', id)
 
     // Increment subject lecture counter (RPC defined in schema.sql).
-    await admin
-      .rpc('increment_subject_lectures', { subject_id: session.subject_id })
-      .catch(() => {})
+    const { error: rpcError } = await admin.rpc('increment_subject_lectures', {
+      subject_id: session.subject_id,
+    })
 
-    return res.json({ present, absent, attendancePercent })
+    // RPC is non-critical for ending session; don't fail the request.
+    if (rpcError) {
+      // eslint-disable-next-line no-console
+      console.warn('increment_subject_lectures RPC failed', rpcError)
+    }
+
+    return res.json({ totalStudents, present, absent, attendancePercent })
   } catch (err) {
     return next(err)
   }
@@ -181,6 +206,7 @@ async function results(req, res, next) {
     if (error) return respondSupabaseError(res, error)
 
     const sessions = (data || []).map((s) => ({
+      total: (s.present_count || 0) + (s.absent_count || 0),
       id: s.id,
       date,
       subject_code: s.subjects?.code,

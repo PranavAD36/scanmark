@@ -61,6 +61,7 @@ export function FacultySessionResultsPage() {
               <th className="sm-th">Subject</th>
               <th className="sm-th">Session ID</th>
               <th className="sm-th">Duration</th>
+              <th className="sm-th text-right">Total</th>
               <th className="sm-th text-right">Present</th>
               <th className="sm-th text-right">Absent</th>
               <th className="sm-th text-right">Attendance %</th>
@@ -68,20 +69,24 @@ export function FacultySessionResultsPage() {
           </thead>
           <tbody>
             {rows.length ? (
-              rows.map((s) => (
-                <tr key={s.id} className="sm-tr">
-                  <td className="sm-td">{s.date}</td>
-                  <td className="sm-td">{s.subject_code}</td>
-                  <td className="sm-td">{s.id}</td>
-                  <td className="sm-td">{s.duration_minutes} min</td>
-                  <td className="sm-td text-right">{s.present}</td>
-                  <td className="sm-td text-right">{s.absent}</td>
-                  <td className="sm-td text-right">{s.attendance_percent}%</td>
-                </tr>
-              ))
+              rows.map((s) => {
+                const total = s.total ?? (Number(s.present || 0) + Number(s.absent || 0))
+                return (
+                  <tr key={s.id} className="sm-tr">
+                    <td className="sm-td">{s.date}</td>
+                    <td className="sm-td">{s.subject_code}</td>
+                    <td className="sm-td">{s.id}</td>
+                    <td className="sm-td">{s.duration_minutes} min</td>
+                    <td className="sm-td text-right">{total}</td>
+                    <td className="sm-td text-right">{s.present}/{total}</td>
+                    <td className="sm-td text-right">{s.absent}</td>
+                    <td className="sm-td text-right">{s.attendance_percent}%</td>
+                  </tr>
+                )
+              })
             ) : (
               <tr>
-                <td className="sm-empty" colSpan={7}>
+                <td className="sm-empty" colSpan={8}>
                   No sessions.
                 </td>
               </tr>

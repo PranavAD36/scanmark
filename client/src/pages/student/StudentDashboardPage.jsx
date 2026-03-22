@@ -15,6 +15,7 @@ function Stat({ label, value }) {
 export function StudentDashboardPage() {
   const [data, setData] = useState(null)
   const [error, setError] = useState('')
+  const loading = !error && data === null
 
   useEffect(() => {
     let mounted = true
@@ -35,11 +36,12 @@ export function StudentDashboardPage() {
       </div>
 
       {error ? <div className="mt-4 text-sm text-red-600">{error}</div> : null}
+      {loading ? <div className="mt-4 text-sm text-slate-600">Loading...</div> : null}
 
       <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Stat label="Today present" value={data?.todayPresent} />
-        <Stat label="Today absent" value={data?.todayAbsent} />
-        <Stat label="Overall %" value={data?.overallPercent} />
+        <Stat label="Today present" value={loading ? '—' : (data?.todayPresent ?? 0)} />
+        <Stat label="Today absent" value={loading ? '—' : (data?.todayAbsent ?? 0)} />
+        <Stat label="Overall %" value={loading ? '—' : (data?.overallPercent ?? 0)} />
       </div>
     </div>
   )

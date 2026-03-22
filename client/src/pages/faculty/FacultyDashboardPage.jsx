@@ -15,6 +15,7 @@ function Stat({ label, value }) {
 export function FacultyDashboardPage() {
   const [data, setData] = useState(null)
   const [error, setError] = useState('')
+  const loading = !error && data === null
 
   useEffect(() => {
     let mounted = true
@@ -35,11 +36,12 @@ export function FacultyDashboardPage() {
       </div>
 
       {error ? <div className="mt-4 text-sm text-red-600">{error}</div> : null}
+      {loading ? <div className="mt-4 text-sm text-slate-600">Loading...</div> : null}
 
       <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Stat label="Today lectures" value={data?.todayLectures} />
-        <Stat label="Completed lectures" value={data?.completedLectures} />
-        <Stat label="Remaining lectures" value={data?.remainingLectures} />
+        <Stat label="Today lectures" value={loading ? '—' : (data?.todayLectures ?? 0)} />
+        <Stat label="Completed lectures" value={loading ? '—' : (data?.completedLectures ?? 0)} />
+        <Stat label="Remaining lectures" value={loading ? '—' : (data?.remainingLectures ?? 0)} />
       </div>
 
       <div className="sm-table-wrap">
