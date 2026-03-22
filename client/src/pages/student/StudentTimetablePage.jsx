@@ -43,7 +43,7 @@ export function StudentTimetablePage() {
         </div>
         <button
           onClick={load}
-          className="sm-btn-primary"
+          className="w-full md:w-auto sm-btn-primary"
         >
           Load
         </button>
@@ -65,7 +65,7 @@ export function StudentTimetablePage() {
             {rows.length ? (
               rows.map((t) => (
                 <tr key={t.id} className="sm-tr">
-                  <td className="sm-td">{t.start_time} - {t.end_time}</td>
+                  <td className="sm-td whitespace-nowrap">{t.start_time} - {t.end_time}</td>
                   <td className="sm-td">{t.subject_code}</td>
                   <td className="sm-td">{t.room || '—'}</td>
                 </tr>

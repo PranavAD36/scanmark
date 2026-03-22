@@ -43,7 +43,7 @@ export function StudentAttendanceRecordsPage() {
         </div>
         <button
           onClick={load}
-          className="sm-btn-primary"
+          className="w-full md:w-auto sm-btn-primary"
         >
           Load
         </button>
@@ -67,7 +67,7 @@ export function StudentAttendanceRecordsPage() {
               rows.map((r) => (
                 <tr key={r.id} className="sm-tr">
                   <td className="sm-td">{r.subject_code}</td>
-                  <td className="sm-td">{r.session_id}</td>
+                  <td className="sm-td break-all">{r.session_id}</td>
                   <td className="sm-td">{r.status}</td>
                   <td className="sm-td">{new Date(r.scanned_at).toLocaleString()}</td>
                 </tr>

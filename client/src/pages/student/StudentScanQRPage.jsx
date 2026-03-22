@@ -72,7 +72,7 @@ export function StudentScanQRPage() {
       <div className="sm-card sm-card-body space-y-3">
         <button
           onClick={startScan}
-          className="sm-btn-primary"
+          className="w-full sm:w-auto sm-btn-primary"
         >
           Scan QR
         </button>
@@ -81,7 +81,7 @@ export function StudentScanQRPage() {
         {error ? <div className="text-sm text-red-600">{error}</div> : null}
 
         <div className="mt-2">
-          <div id={elementId} className="w-full max-w-md" />
+          <div id={elementId} className="w-full max-w-md mx-auto" />
         </div>
 
         <div className="text-xs text-slate-500">

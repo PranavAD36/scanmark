@@ -116,16 +116,32 @@ async function end(req, res, next) {
 
     if (pError) return respondSupabaseError(res, pError)
 
-    const date = isoDate(new Date(session.starts_at))
-    const { data: ttRows, error: ttError } = await admin
+    const sessionDate = String(session.starts_at || '').slice(0, 10)
+
+    // Total students should reflect the registered cohort for this subject.
+    // Prefer date-specific timetable entries (if present), but fall back to all timetable
+    // entries for the subject to avoid 0 totals due to missing date rows/timezone drift.
+    const { data: dateRows, error: dateError } = await admin
       .from('timetable')
       .select('student_user_id')
       .eq('subject_id', session.subject_id)
-      .eq('date', date)
+      .eq('date', sessionDate)
 
-    if (ttError) return respondSupabaseError(res, ttError)
+    if (dateError) return respondSupabaseError(res, dateError)
 
-    const totalStudents = new Set((ttRows || []).map((r) => r.student_user_id)).size
+    let registeredStudentIds = (dateRows || []).map((r) => r.student_user_id)
+
+    if (!registeredStudentIds.length) {
+      const { data: allRows, error: allError } = await admin
+        .from('timetable')
+        .select('student_user_id')
+        .eq('subject_id', session.subject_id)
+
+      if (allError) return respondSupabaseError(res, allError)
+      registeredStudentIds = (allRows || []).map((r) => r.student_user_id)
+    }
+
+    const totalStudents = new Set(registeredStudentIds).size
 
     const present = presentCount || 0
     const absent = Math.max(0, totalStudents - present)

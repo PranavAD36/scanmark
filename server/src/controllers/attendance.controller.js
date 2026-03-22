@@ -154,7 +154,7 @@ async function summary(req, res, next) {
     // Subjects from timetable
     const { data: subjRows, error: subjError } = await admin
       .from('timetable')
-      .select('subject_id, subjects(code)')
+      .select('subject_id, subjects(code, name)')
       .eq('student_user_id', req.profile.id)
 
     if (subjError) return respondSupabaseError(res, subjError)
@@ -163,7 +163,11 @@ async function summary(req, res, next) {
     for (const row of subjRows || []) {
       if (!row.subject_id) continue
       if (!subjectMap.has(row.subject_id)) {
-        subjectMap.set(row.subject_id, { subject_id: row.subject_id, subject_code: row.subjects?.code })
+        subjectMap.set(row.subject_id, {
+          subject_id: row.subject_id,
+          subject_code: row.subjects?.code,
+          subject_name: row.subjects?.name,
+        })
       }
     }
 
@@ -175,6 +179,7 @@ async function summary(req, res, next) {
 
     for (const subjectId of subjectIds) {
       const code = subjectMap.get(subjectId)?.subject_code
+      const name = subjectMap.get(subjectId)?.subject_name
 
       const { count: total, error: totalError } = await admin
         .from('sessions')
@@ -186,9 +191,10 @@ async function summary(req, res, next) {
 
       const { count: present, error: presentError } = await admin
         .from('attendance')
-        .select('id', { count: 'exact', head: true })
+        .select('id, sessions!inner(status)', { count: 'exact', head: true })
         .eq('student_user_id', req.profile.id)
         .eq('subject_id', subjectId)
+        .eq('sessions.status', 'ended')
 
       if (presentError) return respondSupabaseError(res, presentError)
 
@@ -199,7 +205,14 @@ async function summary(req, res, next) {
       overallPresent += p
       overallTotal += t
 
-      subjects.push({ subject_id: subjectId, subject_code: code, present: p, total: t, percent })
+      subjects.push({
+        subject_id: subjectId,
+        subject_code: code,
+        subject_name: name,
+        present: p,
+        total: t,
+        percent,
+      })
     }
 
     const overallPercent = overallTotal > 0 ? Math.round((overallPresent / overallTotal) * 100) : 0

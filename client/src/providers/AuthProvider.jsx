@@ -4,6 +4,33 @@ import { api, setApiAuthToken } from '../lib/api.js'
 
 const AuthContext = createContext(null)
 
+const PROFILE_CACHE_KEY = 'scanmark.profileCache.v1'
+
+function readProfileCache(authUserId) {
+  if (!authUserId) return null
+  try {
+    const raw = localStorage.getItem(PROFILE_CACHE_KEY)
+    if (!raw) return null
+    const obj = JSON.parse(raw)
+    const cached = obj && obj[authUserId]
+    return cached || null
+  } catch {
+    return null
+  }
+}
+
+function writeProfileCache(authUserId, profile) {
+  if (!authUserId || !profile) return
+  try {
+    const raw = localStorage.getItem(PROFILE_CACHE_KEY)
+    const obj = raw ? JSON.parse(raw) : {}
+    obj[authUserId] = profile
+    localStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(obj))
+  } catch {
+    // ignore
+  }
+}
+
 function getDefaultPath(role) {
   if (role === 'admin') return '/admin'
   if (role === 'faculty') return '/faculty'
@@ -27,9 +54,20 @@ export function AuthProvider({ children }) {
       return
     }
 
-    const me = await api.get('/auth/me')
-    setProfile(me.data)
-    return me.data
+    const cached = readProfileCache(nextSession.user?.id)
+    if (cached) setProfile((prev) => prev || cached)
+
+    try {
+      const me = await api.get('/auth/me')
+      setProfile(me.data)
+      writeProfileCache(nextSession.user?.id, me.data)
+      return me.data
+    } catch (error) {
+      console.error(error)
+      // Keep cached profile (if any) so refresh doesn't bounce the user to /login
+      if (cached) return cached
+      return null
+    }
   }
 
   useEffect(() => {
@@ -58,12 +96,17 @@ export function AuthProvider({ children }) {
           setProfile(null)
           return
         }
+
+        const cached = readProfileCache(nextSession.user?.id)
+        if (cached) setProfile((prev) => prev || cached)
         try {
           const me = await api.get('/auth/me')
           setProfile(me.data)
+          writeProfileCache(nextSession.user?.id, me.data)
         } catch (error) {
           console.error(error)
-          setProfile(null)
+          // Keep cached profile if available
+          if (!cached) setProfile(null)
         }
       },
     )
