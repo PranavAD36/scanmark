@@ -126,18 +126,18 @@ async function records(req, res, next) {
     let to = req.query.to
 
     if (!from || !to) {
-      // Fallback: if old-style date param is sent, treat as UTC day
       const date = req.query.date || new Date().toISOString().slice(0, 10)
       from = `${date}T00:00:00.000Z`
       to = `${date}T23:59:59.999Z`
     }
 
+    // Fetch both present and absent attendance records for spent sessions
     const { data, error } = await admin
       .from('attendance')
-      .select('id, session_id, scanned_at, status, subjects(code)')
+      .select('id, session_id, scanned_at, status, subjects(code), sessions!inner(starts_at, status)')
       .eq('student_user_id', req.profile.id)
-      .gte('scanned_at', from)
-      .lte('scanned_at', to)
+      .gte('sessions.starts_at', from)
+      .lte('sessions.starts_at', to)
       .order('scanned_at', { ascending: false })
 
     if (error) return respondSupabaseError(res, error)

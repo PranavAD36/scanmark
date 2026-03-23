@@ -156,6 +156,25 @@ async function end(req, res, next) {
       })
       .eq('id', id)
 
+    // Insert absent attendance records for students who did not scan
+    const absentIds = [...registeredIdSet].filter((sid) => !presentIdSet.has(sid))
+    if (absentIds.length) {
+      const absentRows = absentIds.map((studentId) => ({
+        session_id: id,
+        subject_id: session.subject_id,
+        student_user_id: studentId,
+        scanned_at: endedAt,
+        status: 'absent',
+      }))
+      const { error: absentInsertError } = await admin
+        .from('attendance')
+        .upsert(absentRows, { onConflict: 'session_id,student_user_id', ignoreDuplicates: true })
+      if (absentInsertError) {
+        // eslint-disable-next-line no-console
+        console.warn('Failed to insert absent records', absentInsertError)
+      }
+    }
+
     // Increment subject lecture counter (RPC defined in schema.sql).
     const { error: rpcError } = await admin.rpc('increment_subject_lectures', {
       subject_id: session.subject_id,

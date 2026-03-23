@@ -43,7 +43,6 @@ export function Sidebar() {
             { to: '/student', label: 'Dashboard' },
             { to: '/student/scan', label: 'Scan QR' },
             { to: '/student/records', label: 'Attendance Records' },
-            { to: '/student/summary', label: 'Attendance Summary' },
             { to: '/student/timetable', label: 'Timetable' },
           ]
 

@@ -22,7 +22,6 @@ import { FacultyManualAttendancePage } from './pages/faculty/FacultyManualAttend
 import { StudentDashboardPage } from './pages/student/StudentDashboardPage.jsx'
 import { StudentScanQRPage } from './pages/student/StudentScanQRPage.jsx'
 import { StudentAttendanceRecordsPage } from './pages/student/StudentAttendanceRecordsPage.jsx'
-import { StudentAttendanceSummaryPage } from './pages/student/StudentAttendanceSummaryPage.jsx'
 import { StudentTimetablePage } from './pages/student/StudentTimetablePage.jsx'
 
 function App() {
@@ -76,7 +75,6 @@ function App() {
               <Route index element={<StudentDashboardPage />} />
               <Route path="scan" element={<StudentScanQRPage />} />
               <Route path="records" element={<StudentAttendanceRecordsPage />} />
-              <Route path="summary" element={<StudentAttendanceSummaryPage />} />
               <Route path="timetable" element={<StudentTimetablePage />} />
             </Route>
           </Route>

@@ -2,6 +2,27 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import QRCode from 'qrcode'
 import { api } from '../../lib/api.js'
 
+function StudentList({ title, students, color }) {
+  if (!students?.length) return null
+  return (
+    <div>
+      <div className={`text-xs font-semibold mb-1 ${color}`}>
+        {title} ({students.length})
+      </div>
+      <div className="flex flex-wrap gap-1">
+        {students.map((s, i) => (
+          <span
+            key={i}
+            className="text-xs bg-slate-100 border border-slate-200 rounded px-1.5 py-0.5"
+          >
+            {s.college_id || s.name || '—'}
+          </span>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export function FacultyQRSessionPage() {
   const SUBJECT_STORAGE_KEY = 'scanmark.faculty.selectedSubjectId'
 
@@ -18,6 +39,7 @@ export function FacultyQRSessionPage() {
   const [error, setError] = useState('')
   const [status, setStatus] = useState('')
   const [busy, setBusy] = useState(false)
+  const [sessionResult, setSessionResult] = useState(null)
 
   const selectedSubject = useMemo(
     () => subjects.find((s) => s.id === subjectId) || null,
@@ -106,13 +128,15 @@ export function FacultyQRSessionPage() {
     if (!activeSession) return
     setError('')
     setStatus('')
+    setSessionResult(null)
     setBusy(true)
 
     try {
       const res = await api.post(`/sessions/${activeSession.id}/end`)
-      const total = res.data.totalStudents ?? (res.data.present || 0) + (res.data.absent || 0)
+      const d = res.data
+      setSessionResult(d)
       setStatus(
-        `Session ended. Present: ${res.data.present}/${total}, Absent: ${res.data.absent}, Attendance: ${res.data.attendancePercent}%`,
+        `Session ended. Present: ${d.present}/${d.totalStudents}, Absent: ${d.absent}, Attendance: ${d.attendancePercent}%`,
       )
       setActiveSession(null)
       setQrUrl('')
@@ -215,6 +239,42 @@ export function FacultyQRSessionPage() {
           </div>
         ) : null}
       </div>
+
+      {sessionResult ? (
+        <div className="sm-card sm-card-body space-y-4">
+          <div className="text-base font-semibold text-slate-900">Session Result</div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="text-center p-3 bg-slate-50 rounded-lg">
+              <div className="text-xs text-slate-500">Total</div>
+              <div className="text-xl font-semibold">{sessionResult.totalStudents}</div>
+            </div>
+            <div className="text-center p-3 bg-green-50 rounded-lg">
+              <div className="text-xs text-green-600">Present</div>
+              <div className="text-xl font-semibold text-green-700">{sessionResult.present}</div>
+            </div>
+            <div className="text-center p-3 bg-red-50 rounded-lg">
+              <div className="text-xs text-red-600">Absent</div>
+              <div className="text-xl font-semibold text-red-700">{sessionResult.absent}</div>
+            </div>
+            <div className="text-center p-3 bg-blue-50 rounded-lg">
+              <div className="text-xs text-blue-600">Attendance</div>
+              <div className="text-xl font-semibold text-blue-700">{sessionResult.attendancePercent}%</div>
+            </div>
+          </div>
+
+          <StudentList
+            title="Present Students"
+            students={sessionResult.presentStudents}
+            color="text-green-700"
+          />
+          <StudentList
+            title="Absent Students"
+            students={sessionResult.absentStudents}
+            color="text-red-700"
+          />
+        </div>
+      ) : null}
     </div>
   )
 }
