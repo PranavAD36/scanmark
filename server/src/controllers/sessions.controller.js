@@ -109,42 +109,42 @@ async function end(req, res, next) {
 
     if (updateError) return respondSupabaseError(res, updateError, 400)
 
-    const { count: presentCount, error: pError } = await admin
+    // Get present student IDs (not just a count)
+    const { data: presentRows, error: pError } = await admin
       .from('attendance')
-      .select('id', { count: 'exact', head: true })
+      .select('student_user_id')
       .eq('session_id', id)
 
     if (pError) return respondSupabaseError(res, pError)
 
-    const sessionDate = String(session.starts_at || '').slice(0, 10)
+    const presentIdSet = new Set((presentRows || []).map((r) => r.student_user_id))
 
-    // Total students should reflect the registered cohort for this subject.
-    // Prefer date-specific timetable entries (if present), but fall back to all timetable
-    // entries for the subject to avoid 0 totals due to missing date rows/timezone drift.
-    const { data: dateRows, error: dateError } = await admin
+    // Registered students: all timetable entries for this subject (any date)
+    const { data: ttRows, error: ttError } = await admin
       .from('timetable')
       .select('student_user_id')
       .eq('subject_id', session.subject_id)
-      .eq('date', sessionDate)
 
-    if (dateError) return respondSupabaseError(res, dateError)
+    if (ttError) return respondSupabaseError(res, ttError)
 
-    let registeredStudentIds = (dateRows || []).map((r) => r.student_user_id)
+    const registeredIdSet = new Set((ttRows || []).map((r) => r.student_user_id))
 
-    if (!registeredStudentIds.length) {
-      const { data: allRows, error: allError } = await admin
-        .from('timetable')
-        .select('student_user_id')
-        .eq('subject_id', session.subject_id)
-
-      if (allError) return respondSupabaseError(res, allError)
-      registeredStudentIds = (allRows || []).map((r) => r.student_user_id)
+    // Fallback: if no timetable entries exist for the subject, use all students
+    if (registeredIdSet.size === 0) {
+      const { data: allStudents, error: asError } = await admin
+        .from('users')
+        .select('id')
+        .eq('role', 'student')
+      if (asError) return respondSupabaseError(res, asError)
+      for (const s of allStudents || []) registeredIdSet.add(s.id)
     }
 
-    const totalStudents = new Set(registeredStudentIds).size
+    // Ensure every present student is counted in the total
+    for (const pid of presentIdSet) registeredIdSet.add(pid)
 
-    const present = presentCount || 0
-    const absent = Math.max(0, totalStudents - present)
+    const totalStudents = registeredIdSet.size
+    const present = presentIdSet.size
+    const absent = totalStudents - present
     const attendancePercent = totalStudents > 0 ? Math.round((present / totalStudents) * 100) : 0
 
     await admin
@@ -167,7 +167,34 @@ async function end(req, res, next) {
       console.warn('increment_subject_lectures RPC failed', rpcError)
     }
 
-    return res.json({ totalStudents, present, absent, attendancePercent })
+    // Fetch student details for the response
+    const allIds = [...registeredIdSet]
+    const studentDetails = new Map()
+    if (allIds.length) {
+      const { data: stuData } = await admin
+        .from('users')
+        .select('id, college_id, name')
+        .in('id', allIds)
+      for (const s of stuData || []) {
+        studentDetails.set(s.id, { college_id: s.college_id, name: s.name })
+      }
+    }
+
+    const presentStudents = [...presentIdSet].map(
+      (id) => studentDetails.get(id) || { college_id: id },
+    )
+    const absentStudents = [...registeredIdSet]
+      .filter((id) => !presentIdSet.has(id))
+      .map((id) => studentDetails.get(id) || { college_id: id })
+
+    return res.json({
+      totalStudents,
+      present,
+      absent,
+      attendancePercent,
+      presentStudents,
+      absentStudents,
+    })
   } catch (err) {
     return next(err)
   }
@@ -219,7 +246,7 @@ async function results(req, res, next) {
     const { data, error } = await admin
       .from('sessions')
       .select(
-        'id, starts_at, ends_at, duration_minutes, present_count, absent_count, attendance_percent, subjects(code)',
+        'id, subject_id, starts_at, ends_at, duration_minutes, subjects(code)',
       )
       .eq('faculty_user_id', req.profile.id)
       .eq('status', 'ended')
@@ -229,16 +256,107 @@ async function results(req, res, next) {
 
     if (error) return respondSupabaseError(res, error)
 
-    const sessions = (data || []).map((s) => ({
-      total: (s.present_count || 0) + (s.absent_count || 0),
-      id: s.id,
-      date,
-      subject_code: s.subjects?.code,
-      duration_minutes: s.duration_minutes,
-      present: s.present_count || 0,
-      absent: s.absent_count || 0,
-      attendance_percent: s.attendance_percent || 0,
-    }))
+    if (!data || !data.length) {
+      return res.json({ sessions: [] })
+    }
+
+    const sessionIds = data.map((s) => s.id)
+    const subjectIds = [...new Set(data.map((s) => s.subject_id))]
+
+    // Batch-fetch attendance for all sessions
+    const { data: attData, error: attError } = await admin
+      .from('attendance')
+      .select('session_id, student_user_id')
+      .in('session_id', sessionIds)
+
+    if (attError) return respondSupabaseError(res, attError)
+
+    // Batch-fetch timetable entries for involved subjects (all dates)
+    const { data: ttData, error: ttError } = await admin
+      .from('timetable')
+      .select('subject_id, student_user_id')
+      .in('subject_id', subjectIds)
+
+    if (ttError) return respondSupabaseError(res, ttError)
+
+    // Per-subject registered student sets
+    const registeredBySubject = new Map()
+    for (const sid of subjectIds) {
+      const ids = (ttData || [])
+        .filter((r) => r.subject_id === sid)
+        .map((r) => r.student_user_id)
+      registeredBySubject.set(sid, new Set(ids))
+    }
+
+    // For subjects with no timetable entries, fall back to all students
+    const needAll = subjectIds.some((sid) => registeredBySubject.get(sid).size === 0)
+    if (needAll) {
+      const { data: stuData } = await admin.from('users').select('id').eq('role', 'student')
+      const allIds = new Set((stuData || []).map((r) => r.id))
+      for (const sid of subjectIds) {
+        if (registeredBySubject.get(sid).size === 0) {
+          registeredBySubject.set(sid, new Set(allIds))
+        }
+      }
+    }
+
+    // Per-session present student sets
+    const presentBySession = new Map()
+    for (const row of attData || []) {
+      if (!presentBySession.has(row.session_id)) {
+        presentBySession.set(row.session_id, new Set())
+      }
+      presentBySession.get(row.session_id).add(row.student_user_id)
+    }
+
+    // Collect all student IDs for detail lookup
+    const allIdSet = new Set()
+    for (const [, ids] of registeredBySubject) for (const id of ids) allIdSet.add(id)
+    for (const [, ids] of presentBySession) for (const id of ids) allIdSet.add(id)
+
+    const studentDetails = new Map()
+    if (allIdSet.size > 0) {
+      const { data: stuData } = await admin
+        .from('users')
+        .select('id, college_id, name')
+        .in('id', [...allIdSet])
+      for (const s of stuData || []) {
+        studentDetails.set(s.id, { college_id: s.college_id, name: s.name })
+      }
+    }
+
+    const sessions = data.map((s) => {
+      const presentIds = presentBySession.get(s.id) || new Set()
+      const registered = new Set(registeredBySubject.get(s.subject_id) || [])
+
+      // Ensure every present student is counted in total
+      for (const pid of presentIds) registered.add(pid)
+
+      const total = registered.size
+      const presentCount = presentIds.size
+      const absentCount = total - presentCount
+      const pct = total > 0 ? Math.round((presentCount / total) * 100) : 0
+
+      const presentStudents = [...presentIds].map(
+        (id) => studentDetails.get(id) || { college_id: id },
+      )
+      const absentStudents = [...registered]
+        .filter((id) => !presentIds.has(id))
+        .map((id) => studentDetails.get(id) || { college_id: id })
+
+      return {
+        id: s.id,
+        date: String(s.starts_at || '').slice(0, 10),
+        subject_code: s.subjects?.code,
+        duration_minutes: s.duration_minutes,
+        total,
+        present: presentCount,
+        absent: absentCount,
+        attendance_percent: pct,
+        present_students: presentStudents,
+        absent_students: absentStudents,
+      }
+    })
 
     return res.json({ sessions })
   } catch (err) {

@@ -180,6 +180,25 @@ async function summary(req, res, next) {
       }
     }
 
+    // Also include subjects from the student's actual attendance records
+    const { data: attSubjRows, error: attSubjError } = await admin
+      .from('attendance')
+      .select('subject_id, subjects(code, name)')
+      .eq('student_user_id', req.profile.id)
+
+    if (attSubjError) return respondSupabaseError(res, attSubjError)
+
+    for (const row of attSubjRows || []) {
+      if (!row.subject_id) continue
+      if (!subjectMap.has(row.subject_id)) {
+        subjectMap.set(row.subject_id, {
+          subject_id: row.subject_id,
+          subject_code: row.subjects?.code,
+          subject_name: row.subjects?.name,
+        })
+      }
+    }
+
     const subjectIds = Array.from(subjectMap.keys())
 
     const subjects = []
