@@ -9,5 +9,6 @@ router.use(requireAuth)
 router.get('/', subjectsController.list)
 router.post('/', subjectsController.create)
 router.delete('/:id', subjectsController.remove)
+router.put('/:id', subjectsController.update)
 
 module.exports = router

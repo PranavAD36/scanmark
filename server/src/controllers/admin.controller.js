@@ -188,6 +188,113 @@ async function createFaculty(req, res, next) {
   }
 }
 
+async function deleteUser(req, res, next) {
+  try {
+    const id = req.params.id
+    const admin = getSupabaseAdmin()
+
+    const { data: user, error: fetchErr } = await admin
+      .from('users')
+      .select('auth_user_id, role')
+      .eq('id', id)
+      .maybeSingle()
+
+    if (fetchErr) return respondSupabaseError(res, fetchErr)
+    if (!user) return res.status(404).json({ error: 'User not found' })
+    if (user.role === 'admin') {
+      return res.status(403).json({ error: 'Cannot delete admin users' })
+    }
+
+    // Delete from users table (cascades to students/faculty via FK)
+    const { error: delErr } = await admin.from('users').delete().eq('id', id)
+    if (delErr) return respondSupabaseError(res, delErr)
+
+    // Delete from Supabase Auth
+    const { error: authErr } = await admin.auth.admin.deleteUser(user.auth_user_id)
+    if (authErr) {
+      // eslint-disable-next-line no-console
+      console.warn('Failed to delete auth user', authErr)
+    }
+
+    return res.json({ ok: true })
+  } catch (err) {
+    return next(err)
+  }
+}
+
+async function updateUser(req, res, next) {
+  try {
+    const id = req.params.id
+    const body = z
+      .object({
+        name: z.string().min(1).optional(),
+        email: z.string().email().optional(),
+        collegeId: z.string().min(1).optional(),
+        facultyId: z.string().min(1).optional(),
+        password: z.string().min(8).optional(),
+      })
+      .parse(req.body)
+
+    const admin = getSupabaseAdmin()
+
+    const { data: user, error: fetchErr } = await admin
+      .from('users')
+      .select('id, auth_user_id, role')
+      .eq('id', id)
+      .maybeSingle()
+
+    if (fetchErr) return respondSupabaseError(res, fetchErr)
+    if (!user) return res.status(404).json({ error: 'User not found' })
+
+    // Update users table
+    const usersUpdate = {}
+    if (body.name) usersUpdate.name = body.name
+    if (body.email) usersUpdate.email = body.email
+    if (body.collegeId && user.role === 'student') usersUpdate.college_id = body.collegeId
+    if (body.facultyId && user.role === 'faculty') usersUpdate.faculty_id = body.facultyId
+
+    if (Object.keys(usersUpdate).length) {
+      const { error: uErr } = await admin.from('users').update(usersUpdate).eq('id', id)
+      if (uErr) return respondSupabaseError(res, uErr, 400)
+    }
+
+    // Update profile table
+    if (user.role === 'student') {
+      const stuUpdate = {}
+      if (body.name) stuUpdate.name = body.name
+      if (body.email) stuUpdate.email = body.email
+      if (body.collegeId) stuUpdate.college_id = body.collegeId
+      if (Object.keys(stuUpdate).length) {
+        await admin.from('students').update(stuUpdate).eq('user_id', id)
+      }
+    } else if (user.role === 'faculty') {
+      const facUpdate = {}
+      if (body.name) facUpdate.name = body.name
+      if (body.email) facUpdate.email = body.email
+      if (body.facultyId) facUpdate.faculty_id = body.facultyId
+      if (Object.keys(facUpdate).length) {
+        await admin.from('faculty').update(facUpdate).eq('user_id', id)
+      }
+    }
+
+    // Update auth if email or password changed
+    const authUpdate = {}
+    if (body.email) authUpdate.email = body.email
+    if (body.password) authUpdate.password = body.password
+    if (Object.keys(authUpdate).length) {
+      const { error: authErr } = await admin.auth.admin.updateUserById(
+        user.auth_user_id,
+        authUpdate,
+      )
+      if (authErr) return res.status(400).json({ error: authErr.message })
+    }
+
+    return res.json({ ok: true })
+  } catch (err) {
+    return next(err)
+  }
+}
+
 module.exports = {
   stats,
   listStudents,
@@ -195,4 +302,6 @@ module.exports = {
   listUsers,
   createStudent,
   createFaculty,
+  deleteUser,
+  updateUser,
 }

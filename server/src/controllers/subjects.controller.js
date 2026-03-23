@@ -10,7 +10,7 @@ async function list(req, res, next) {
       const { data, error } = await admin
         .from('subjects')
         .select('id, code, name, faculty_user_id')
-        .eq('faculty_user_id', req.profile.id)
+        .or(`faculty_user_id.eq.${req.profile.id},faculty_user_id.is.null`)
         .order('code')
       if (error) return respondSupabaseError(res, error)
       return res.json({ subjects: data })
@@ -34,7 +34,7 @@ async function list(req, res, next) {
     // admin: all subjects
     const { data, error } = await admin
       .from('subjects')
-      .select('id, code, name, faculty_user_id, faculty:faculty_user_id(faculty_id)')
+      .select('id, code, name, faculty_user_id, faculty:faculty_user_id(faculty_id, name)')
       .order('code')
 
     if (error) return respondSupabaseError(res, error)
@@ -44,6 +44,7 @@ async function list(req, res, next) {
       code: s.code,
       name: s.name,
       faculty_id: s.faculty?.faculty_id || null,
+      faculty_name: s.faculty?.name || null,
       faculty_user_id: s.faculty_user_id,
     }))
 
@@ -64,13 +65,16 @@ async function create(req, res, next) {
         code: z.string().min(1),
         name: z.string().min(1),
         facultyId: z.string().nullable().optional(),
+        facultyUserId: z.string().uuid().nullable().optional(),
       })
       .parse(req.body)
 
     const admin = getSupabaseAdmin()
 
     let facultyUserId = null
-    if (body.facultyId) {
+    if (body.facultyUserId) {
+      facultyUserId = body.facultyUserId
+    } else if (body.facultyId) {
       const { data: fac, error: facError } = await admin
         .from('users')
         .select('id')
@@ -115,4 +119,34 @@ async function remove(req, res, next) {
   }
 }
 
-module.exports = { list, create, remove }
+async function update(req, res, next) {
+  try {
+    if (req.profile.role !== 'admin') {
+      return res.status(403).json({ error: 'Only admin can edit subjects' })
+    }
+
+    const id = req.params.id
+    const body = z
+      .object({
+        code: z.string().min(1).optional(),
+        name: z.string().min(1).optional(),
+        facultyUserId: z.string().uuid().nullable().optional(),
+      })
+      .parse(req.body)
+
+    const admin = getSupabaseAdmin()
+
+    const updateObj = {}
+    if (body.code !== undefined) updateObj.code = body.code
+    if (body.name !== undefined) updateObj.name = body.name
+    if (body.facultyUserId !== undefined) updateObj.faculty_user_id = body.facultyUserId
+
+    const { error } = await admin.from('subjects').update(updateObj).eq('id', id)
+    if (error) return respondSupabaseError(res, error, 400)
+    return res.json({ ok: true })
+  } catch (err) {
+    return next(err)
+  }
+}
+
+module.exports = { list, create, remove, update }

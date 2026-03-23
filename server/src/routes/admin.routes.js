@@ -12,5 +12,7 @@ router.post('/students', adminController.createStudent)
 router.get('/faculty', adminController.listFaculty)
 router.post('/faculty', adminController.createFaculty)
 router.get('/users', adminController.listUsers)
+router.delete('/users/:id', adminController.deleteUser)
+router.put('/users/:id', adminController.updateUser)
 
 module.exports = router
