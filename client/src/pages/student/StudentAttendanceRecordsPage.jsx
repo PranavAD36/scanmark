@@ -1,19 +1,30 @@
 import { useCallback, useEffect, useState } from 'react'
 import { api } from '../../lib/api.js'
 
-function todayISO() {
-  return new Date().toISOString().slice(0, 10)
+function todayLocal() {
+  const d = new Date()
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
+}
+
+function localDateToUTCRange(dateStr) {
+  const from = new Date(dateStr + 'T00:00:00').toISOString()
+  const to = new Date(dateStr + 'T23:59:59.999').toISOString()
+  return { from, to }
 }
 
 export function StudentAttendanceRecordsPage() {
-  const [date, setDate] = useState(todayISO())
+  const [date, setDate] = useState(todayLocal())
   const [rows, setRows] = useState([])
   const [error, setError] = useState('')
 
   const load = useCallback(async () => {
     setError('')
     try {
-      const res = await api.get('/attendance/records', { params: { date } })
+      const { from, to } = localDateToUTCRange(date)
+      const res = await api.get('/attendance/records', { params: { from, to } })
       setRows(res.data.records)
     } catch (e) {
       setError(e?.response?.data?.error || e.message)
@@ -51,7 +62,27 @@ export function StudentAttendanceRecordsPage() {
 
       {error ? <div className="text-sm text-red-600">{error}</div> : null}
 
-      <div className="sm-table-wrap">
+      {/* Mobile card view */}
+      <div className="md:hidden space-y-3">
+        {rows.length ? (
+          rows.map((r) => (
+            <div key={r.id} className="sm-card sm-card-body space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="font-medium text-slate-900">{r.subject_code}</span>
+                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                  r.status === 'present' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
+                }`}>{r.status}</span>
+              </div>
+              <div className="text-xs text-slate-500">{new Date(r.scanned_at).toLocaleString()}</div>
+            </div>
+          ))
+        ) : (
+          <div className="text-sm text-slate-500">No records.</div>
+        )}
+      </div>
+
+      {/* Desktop table view */}
+      <div className="sm-table-wrap hidden md:block">
         <div className="overflow-auto">
         <table className="sm-table">
           <thead className="sm-thead">

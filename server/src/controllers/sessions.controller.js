@@ -205,8 +205,16 @@ async function active(req, res, next) {
 
 async function results(req, res, next) {
   try {
-    const date = req.query.date || isoDate(new Date())
     const admin = getSupabaseAdmin()
+
+    let from = req.query.from
+    let to = req.query.to
+    const date = req.query.date || isoDate(new Date())
+
+    if (!from || !to) {
+      from = `${date}T00:00:00.000Z`
+      to = `${date}T23:59:59.999Z`
+    }
 
     const { data, error } = await admin
       .from('sessions')
@@ -215,8 +223,8 @@ async function results(req, res, next) {
       )
       .eq('faculty_user_id', req.profile.id)
       .eq('status', 'ended')
-      .gte('starts_at', `${date}T00:00:00.000Z`)
-      .lte('starts_at', `${date}T23:59:59.999Z`)
+      .gte('starts_at', from)
+      .lte('starts_at', to)
       .order('starts_at', { ascending: false })
 
     if (error) return respondSupabaseError(res, error)

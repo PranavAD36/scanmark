@@ -1,12 +1,16 @@
 import { useCallback, useEffect, useState } from 'react'
 import { api } from '../../lib/api.js'
 
-function todayISO() {
-  return new Date().toISOString().slice(0, 10)
+function todayLocal() {
+  const d = new Date()
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
 }
 
 export function StudentTimetablePage() {
-  const [date, setDate] = useState(todayISO())
+  const [date, setDate] = useState(todayLocal())
   const [rows, setRows] = useState([])
   const [error, setError] = useState('')
 
@@ -51,7 +55,25 @@ export function StudentTimetablePage() {
 
       {error ? <div className="text-sm text-red-600">{error}</div> : null}
 
-      <div className="sm-table-wrap">
+      {/* Mobile card view */}
+      <div className="md:hidden space-y-3">
+        {rows.length ? (
+          rows.map((t) => (
+            <div key={t.id} className="sm-card sm-card-body space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="font-medium text-slate-900">{t.subject_code}</span>
+                <span className="text-xs text-slate-500">{t.room || '—'}</span>
+              </div>
+              <div className="text-xs text-slate-500">{t.start_time} - {t.end_time}</div>
+            </div>
+          ))
+        ) : (
+          <div className="text-sm text-slate-500">No timetable items.</div>
+        )}
+      </div>
+
+      {/* Desktop table view */}
+      <div className="sm-table-wrap hidden md:block">
         <div className="overflow-auto">
         <table className="sm-table">
           <thead className="sm-thead">

@@ -43,7 +43,31 @@ export function StudentDashboardPage() {
         <div className="sm-card-header">
           <div className="sm-card-title">By subject</div>
         </div>
-        <div className="overflow-auto">
+
+        {/* Mobile card view */}
+        <div className="md:hidden p-3 space-y-3">
+          {subjects.length ? (
+            subjects.map((s) => (
+              <div key={s.subject_id} className="border border-slate-200 rounded-lg p-3 space-y-1">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="font-medium text-slate-900">{s.subject_code || '—'}</div>
+                    {s.subject_name ? <div className="text-xs text-slate-500">{s.subject_name}</div> : null}
+                  </div>
+                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                    Number(s.percent || 0) >= 75 ? 'bg-green-50 text-green-700' : Number(s.percent || 0) >= 50 ? 'bg-yellow-50 text-yellow-700' : 'bg-red-50 text-red-700'
+                  }`}>{Number(s.percent || 0)}%</span>
+                </div>
+                <div className="text-xs text-slate-500">{Number(s.present || 0)}/{Number(s.total || 0)} sessions</div>
+              </div>
+            ))
+          ) : (
+            <div className="text-sm text-slate-500 py-3">{loading ? 'Loading...' : 'No attendance data yet.'}</div>
+          )}
+        </div>
+
+        {/* Desktop table view */}
+        <div className="overflow-auto hidden md:block">
           <table className="sm-table">
             <thead className="sm-thead">
               <tr>

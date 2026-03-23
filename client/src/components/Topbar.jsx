@@ -9,8 +9,8 @@ export function Topbar() {
         <div className="font-semibold text-slate-900">
           <span className="text-blue-700">Scan</span>Mark
         </div>
-        <div className="flex items-center gap-3">
-          <div className="text-sm text-slate-600 hidden sm:block">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="text-sm text-slate-600 hidden sm:block truncate max-w-[200px]">
             {profile?.name || profile?.collegeId || profile?.email || ''}
           </div>
           <button

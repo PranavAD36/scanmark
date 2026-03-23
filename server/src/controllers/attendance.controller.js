@@ -120,15 +120,24 @@ async function manual(req, res, next) {
 
 async function records(req, res, next) {
   try {
-    const date = req.query.date || new Date().toISOString().slice(0, 10)
     const admin = getSupabaseAdmin()
+
+    let from = req.query.from
+    let to = req.query.to
+
+    if (!from || !to) {
+      // Fallback: if old-style date param is sent, treat as UTC day
+      const date = req.query.date || new Date().toISOString().slice(0, 10)
+      from = `${date}T00:00:00.000Z`
+      to = `${date}T23:59:59.999Z`
+    }
 
     const { data, error } = await admin
       .from('attendance')
       .select('id, session_id, scanned_at, status, subjects(code)')
       .eq('student_user_id', req.profile.id)
-      .gte('scanned_at', `${date}T00:00:00.000Z`)
-      .lte('scanned_at', `${date}T23:59:59.999Z`)
+      .gte('scanned_at', from)
+      .lte('scanned_at', to)
       .order('scanned_at', { ascending: false })
 
     if (error) return respondSupabaseError(res, error)

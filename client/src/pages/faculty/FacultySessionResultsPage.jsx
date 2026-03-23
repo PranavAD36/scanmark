@@ -1,20 +1,30 @@
 import { useCallback, useEffect, useState } from 'react'
 import { api } from '../../lib/api.js'
 
-function todayISO() {
+function todayLocal() {
   const d = new Date()
-  return d.toISOString().slice(0, 10)
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
+}
+
+function localDateToUTCRange(dateStr) {
+  const from = new Date(dateStr + 'T00:00:00').toISOString()
+  const to = new Date(dateStr + 'T23:59:59.999').toISOString()
+  return { from, to }
 }
 
 export function FacultySessionResultsPage() {
-  const [date, setDate] = useState(todayISO())
+  const [date, setDate] = useState(todayLocal())
   const [rows, setRows] = useState([])
   const [error, setError] = useState('')
 
   const load = useCallback(async () => {
     setError('')
     try {
-      const res = await api.get('/sessions/results', { params: { date } })
+      const { from, to } = localDateToUTCRange(date)
+      const res = await api.get('/sessions/results', { params: { from, to } })
       setRows(res.data.sessions)
     } catch (e) {
       setError(e?.response?.data?.error || e.message)
@@ -52,7 +62,33 @@ export function FacultySessionResultsPage() {
 
       {error ? <div className="text-sm text-red-600">{error}</div> : null}
 
-      <div className="sm-table-wrap">
+      {/* Mobile card view */}
+      <div className="md:hidden space-y-3">
+        {rows.length ? (
+          rows.map((s) => {
+            const total = s.total ?? (Number(s.present || 0) + Number(s.absent || 0))
+            return (
+              <div key={s.id} className="sm-card sm-card-body space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-medium text-slate-900">{s.subject_code}</span>
+                  <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700">{s.attendance_percent}%</span>
+                </div>
+                <div className="grid grid-cols-3 gap-2 text-center text-sm">
+                  <div><div className="text-xs text-slate-500">Present</div><div className="font-medium text-green-700">{s.present}</div></div>
+                  <div><div className="text-xs text-slate-500">Absent</div><div className="font-medium text-red-700">{s.absent}</div></div>
+                  <div><div className="text-xs text-slate-500">Total</div><div className="font-medium">{total}</div></div>
+                </div>
+                <div className="text-xs text-slate-500">{s.duration_minutes} min &middot; {s.date}</div>
+              </div>
+            )
+          })
+        ) : (
+          <div className="text-sm text-slate-500">No sessions.</div>
+        )}
+      </div>
+
+      {/* Desktop table view */}
+      <div className="sm-table-wrap hidden md:block">
         <div className="overflow-auto">
         <table className="sm-table">
           <thead className="sm-thead">

@@ -38,7 +38,28 @@ export function StudentAttendanceSummaryPage() {
         <div className="sm-card-header">
           <div className="sm-card-title">By subject</div>
         </div>
-        <div className="overflow-auto">
+
+        {/* Mobile card view */}
+        <div className="md:hidden p-3 space-y-3">
+          {(data?.subjects || []).length ? (
+            data.subjects.map((s) => (
+              <div key={s.subject_id} className="border border-slate-200 rounded-lg p-3 space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="font-medium text-slate-900">{s.subject_code}</span>
+                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                    s.percent >= 75 ? 'bg-green-50 text-green-700' : s.percent >= 50 ? 'bg-yellow-50 text-yellow-700' : 'bg-red-50 text-red-700'
+                  }`}>{s.percent}%</span>
+                </div>
+                <div className="text-xs text-slate-500">{s.present} present / {s.total} total</div>
+              </div>
+            ))
+          ) : (
+            <div className="text-sm text-slate-500 py-3">No data.</div>
+          )}
+        </div>
+
+        {/* Desktop table view */}
+        <div className="overflow-auto hidden md:block">
         <table className="sm-table">
           <thead className="sm-thead">
             <tr>
