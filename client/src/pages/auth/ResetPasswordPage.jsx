@@ -15,36 +15,54 @@ export function ResetPasswordPage() {
   const readyRef = useRef(false)
 
   useEffect(() => {
-    // The recovery link from email contains tokens in the URL hash.
-    // Supabase JS client detects them via detectSessionInUrl: true and fires
-    // a PASSWORD_RECOVERY auth state change event.
+    // Recovery links arrive in two forms depending on Supabase configuration:
     //
-    // The AuthProvider is intentionally configured to skip PASSWORD_RECOVERY
-    // events so that this page can handle the recovery session itself.
+    // Implicit flow (older/default):
+    //   /reset-password#access_token=TOKEN&type=recovery
+    //   → Supabase JS reads the hash via detectSessionInUrl and fires PASSWORD_RECOVERY
+    //
+    // PKCE flow (newer Supabase projects):
+    //   /reset-password?code=AUTH_CODE
+    //   → We must explicitly exchange the code for a session
 
+    const markReady = () => {
+      readyRef.current = true
+      setSessionReady(true)
+    }
+
+    // 1. Listen for auth state changes (handles implicit flow)
     const { data: subscription } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') {
-        readyRef.current = true
-        setSessionReady(true)
+        markReady()
       }
     })
 
-    // The hash tokens may have already been consumed before this listener
-    // mounted (race with supabase client init). Check for an existing session.
+    // 2. Handle PKCE flow: exchange ?code= param for a session
+    const url = new URL(window.location.href)
+    const code = url.searchParams.get('code')
+    if (code) {
+      supabase.auth.exchangeCodeForSession(code)
+        .then(({ error: exchangeErr }) => {
+          if (exchangeErr) {
+            console.warn('Code exchange failed:', exchangeErr.message)
+            setSessionError(true)
+          } else {
+            markReady()
+          }
+        })
+        .catch(() => setSessionError(true))
+    }
+
+    // 3. Fallback: check if the session was already established
+    //    (hash tokens may have been consumed before our listener mounted)
     supabase.auth.getSession().then(({ data }) => {
-      if (data?.session) {
-        readyRef.current = true
-        setSessionReady(true)
-      }
+      if (data?.session) markReady()
     })
 
-    // Give Supabase enough time to process the URL hash tokens.
-    // If no recovery session is established, show guidance.
+    // 4. Timeout: if nothing worked within 8 seconds, show guidance
     const timer = setTimeout(() => {
-      if (!readyRef.current) {
-        setSessionError(true)
-      }
-    }, 6000)
+      if (!readyRef.current) setSessionError(true)
+    }, 8000)
 
     return () => {
       clearTimeout(timer)
@@ -92,7 +110,6 @@ export function ResetPasswordPage() {
       }
 
       setStatus('Password updated successfully. You can now log in with your new password.')
-      // Sign out so the user starts a clean login session
       await supabase.auth.signOut().catch(() => {})
       setTimeout(() => navigate('/login', { replace: true }), 2000)
     } catch (err) {
@@ -218,6 +235,11 @@ export function ResetPasswordPage() {
               </Link>
             </div>
           </div>
+        )}
+      </form>
+    </div>
+  )
+}
         )}
       </form>
     </div>

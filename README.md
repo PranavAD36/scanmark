@@ -156,3 +156,42 @@ Open:
 
 - Camera not working in desktop browser: test on a real phone or ensure HTTPS / permissions.
 - If login by College ID fails: ensure `public.users.college_id` (or `faculty_id`) is populated and `email` is correct.
+
+---
+
+## Password Reset — Supabase Dashboard Configuration
+
+The forgot password flow uses Supabase's built-in `resetPasswordForEmail` to send
+a recovery email. The code dynamically uses `window.location.origin` for the
+redirect URL, but **Supabase must be configured to allow those URLs** — otherwise
+the email link will redirect to the wrong origin (e.g. localhost instead of production).
+
+### Required settings (Supabase Dashboard)
+
+1. **Authentication → URL Configuration → Site URL**
+   - Set to your production URL: `https://scanmark-sage.vercel.app`
+   - This is the fallback redirect when no explicit `redirectTo` is allowed.
+
+2. **Authentication → URL Configuration → Redirect URLs**
+   - Add **both** of these:
+     - `http://localhost:5173/reset-password`
+     - `https://scanmark-sage.vercel.app/reset-password`
+   - You can also add wildcard patterns:
+     - `http://localhost:5173/**`
+     - `https://scanmark-sage.vercel.app/**`
+
+3. **Authentication → Email Templates → Reset Password**
+   - Customise the template HTML for ScanMark branding (logo, colors, name).
+   - The `{{ .ConfirmationURL }}` variable inserts the reset link.
+
+4. **Project Settings → Auth → SMTP Settings** _(optional, for branded sender)_
+   - Enable "Custom SMTP"
+   - Set sender name: `ScanMark`
+   - Set sender email: `noreply@yourdomain.com`
+   - Configure your SMTP host, port, username, password (SendGrid, Resend, etc.)
+
+> **Why does the email link open localhost?**
+>
+> Supabase validates the `redirectTo` value against the Redirect URLs allowlist.
+> If your production URL is not in the list, Supabase falls back to the **Site URL**.
+> If Site URL is still `http://localhost:5173`, the user gets redirected there.

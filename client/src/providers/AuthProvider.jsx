@@ -101,6 +101,12 @@ export function AuthProvider({ children }) {
       async (_event, nextSession) => {
         // Let the ResetPasswordPage handle recovery — don't fetch profile.
         if (_event === 'PASSWORD_RECOVERY') return
+        // Avoid interfering with recovery when a SIGNED_IN fires from code exchange
+        // on the reset-password page.
+        if (
+          _event === 'SIGNED_IN' &&
+          window.location.pathname === '/reset-password'
+        ) return
 
         setSession(nextSession)
         setApiAuthToken(nextSession?.access_token || null)
