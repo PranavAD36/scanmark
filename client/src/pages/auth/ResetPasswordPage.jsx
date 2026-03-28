@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase.js'
 
@@ -12,30 +12,39 @@ export function ResetPasswordPage() {
   const [fieldErrors, setFieldErrors] = useState({})
   const [sessionReady, setSessionReady] = useState(false)
   const [sessionError, setSessionError] = useState(false)
+  const readyRef = useRef(false)
 
   useEffect(() => {
-    // Supabase client auto-detects the recovery token fragments in the URL
-    // via detectSessionInUrl: true. Listen for the PASSWORD_RECOVERY event.
+    // The recovery link from email contains tokens in the URL hash.
+    // Supabase JS client detects them via detectSessionInUrl: true and fires
+    // a PASSWORD_RECOVERY auth state change event.
+    //
+    // The AuthProvider is intentionally configured to skip PASSWORD_RECOVERY
+    // events so that this page can handle the recovery session itself.
+
     const { data: subscription } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'PASSWORD_RECOVERY') {
+      if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') {
+        readyRef.current = true
         setSessionReady(true)
       }
     })
 
-    // Also check if a session already exists (user may have arrived earlier)
+    // The hash tokens may have already been consumed before this listener
+    // mounted (race with supabase client init). Check for an existing session.
     supabase.auth.getSession().then(({ data }) => {
       if (data?.session) {
+        readyRef.current = true
         setSessionReady(true)
       }
     })
 
-    // If no recovery session is established within 5 seconds, show guidance
+    // Give Supabase enough time to process the URL hash tokens.
+    // If no recovery session is established, show guidance.
     const timer = setTimeout(() => {
-      setSessionReady((ready) => {
-        if (!ready) setSessionError(true)
-        return ready
-      })
-    }, 5000)
+      if (!readyRef.current) {
+        setSessionError(true)
+      }
+    }, 6000)
 
     return () => {
       clearTimeout(timer)
@@ -46,14 +55,14 @@ export function ResetPasswordPage() {
   const validate = () => {
     const errs = {}
     if (!password) {
-      errs.password = 'Password is required'
+      errs.password = 'Password is required.'
     } else if (password.length < 8) {
-      errs.password = 'Password must be at least 8 characters'
+      errs.password = 'Password must be at least 8 characters.'
     }
     if (!confirmPassword) {
-      errs.confirmPassword = 'Please confirm your password'
+      errs.confirmPassword = 'Please confirm your new password.'
     } else if (password !== confirmPassword) {
-      errs.confirmPassword = 'Passwords do not match'
+      errs.confirmPassword = 'Passwords do not match.'
     }
     return errs
   }
@@ -73,20 +82,27 @@ export function ResetPasswordPage() {
       })
       if (updateError) {
         const msg = updateError.message || ''
-        if (msg.toLowerCase().includes('same password') || msg.toLowerCase().includes('should be different')) {
+        if (
+          msg.toLowerCase().includes('same password') ||
+          msg.toLowerCase().includes('should be different')
+        ) {
           throw new Error('New password must be different from your current password.')
         }
         throw updateError
       }
 
-      setStatus('Password updated successfully! Redirecting to login…')
-      // Sign out so the user logs in fresh with new password
+      setStatus('Password updated successfully. You can now log in with your new password.')
+      // Sign out so the user starts a clean login session
       await supabase.auth.signOut().catch(() => {})
-      setTimeout(() => navigate('/login', { replace: true }), 1500)
+      setTimeout(() => navigate('/login', { replace: true }), 2000)
     } catch (err) {
       const msg = err?.message || ''
-      if (msg.toLowerCase().includes('not authorized') || msg.toLowerCase().includes('session')) {
-        setError('Reset link expired or invalid. Please request a new one.')
+      if (
+        msg.toLowerCase().includes('not authorized') ||
+        msg.toLowerCase().includes('session') ||
+        msg.toLowerCase().includes('auth')
+      ) {
+        setError('This reset link is invalid or has expired. Please request a new one.')
       } else {
         setError(msg || 'Could not update password. Please try again.')
       }
@@ -95,7 +111,7 @@ export function ResetPasswordPage() {
     }
   }
 
-  // Show expired/invalid link state
+  // Show expired / invalid link state
   if (sessionError && !sessionReady) {
     return (
       <div className="min-h-screen grid place-items-center bg-slate-50 p-4">
@@ -136,7 +152,11 @@ export function ResetPasswordPage() {
         </div>
 
         {!sessionReady ? (
-          <div className="mt-6 text-sm text-slate-500">
+          <div className="mt-6 flex items-center gap-2 text-sm text-slate-500">
+            <svg className="animate-spin h-4 w-4 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
             Verifying reset link…
           </div>
         ) : (
@@ -169,7 +189,7 @@ export function ResetPasswordPage() {
                 className="mt-1 sm-input"
                 type="password"
                 autoComplete="new-password"
-                placeholder="Re-enter password"
+                placeholder="Re-enter your new password"
                 required
               />
               {fieldErrors.confirmPassword ? (
@@ -189,7 +209,7 @@ export function ResetPasswordPage() {
               disabled={saving}
               className="w-full sm-btn-primary"
             >
-              {saving ? 'Saving…' : 'Update password'}
+              {saving ? 'Updating…' : 'Update password'}
             </button>
 
             <div className="text-sm text-slate-600">
@@ -198,6 +218,11 @@ export function ResetPasswordPage() {
               </Link>
             </div>
           </div>
+        )}
+      </form>
+    </div>
+  )
+}
         )}
       </form>
     </div>

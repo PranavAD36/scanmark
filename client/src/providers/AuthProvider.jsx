@@ -99,6 +99,9 @@ export function AuthProvider({ children }) {
 
     const { data: subscription } = supabase.auth.onAuthStateChange(
       async (_event, nextSession) => {
+        // Let the ResetPasswordPage handle recovery — don't fetch profile.
+        if (_event === 'PASSWORD_RECOVERY') return
+
         setSession(nextSession)
         setApiAuthToken(nextSession?.access_token || null)
         if (!nextSession) {

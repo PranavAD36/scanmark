@@ -15,48 +15,59 @@ export function ForgotPasswordPage() {
     setSent(false)
     const trimmed = input.trim()
     if (!trimmed) {
-      setError('Please enter your College ID or email.')
+      setError('Please enter your registered email address.')
       return
     }
-    setSending(true)
 
-    try {
-      // Resolve college/faculty ID to email via backend
-      let email = trimmed
-      if (!trimmed.includes('@')) {
-        try {
-          const res = await api.post('/auth/resolve-login', { collegeId: trimmed })
-          email = res.data.email
-        } catch (resolveErr) {
-          const status = resolveErr?.response?.status
-          if (status === 404) {
-            setError('No account found for that ID. Please check and try again.')
-            return
-          }
-          throw resolveErr
-        }
-      }
-
-      // Basic email format check
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        setError('Invalid email address. Please check and try again.')
+    // Resolve college/faculty ID to email, or use email directly
+    let email = trimmed
+    if (!trimmed.includes('@')) {
+      try {
+        const res = await api.post('/auth/resolve-login', { collegeId: trimmed })
+        email = res.data.email
+      } catch (resolveErr) {
+        // Show a privacy-safe message for all resolve failures
+        setSent(true)
         return
       }
+    }
 
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError('Please enter a valid email address.')
+      return
+    }
+
+    setSending(true)
+    try {
+      /*
+       * Supabase Auth: resetPasswordForEmail sends a magic link to the user.
+       * The redirectTo must point to the app's /reset-password route where
+       * the recovery session token (in the URL hash) will be consumed.
+       *
+       * Branded email setup (configure in Supabase Dashboard):
+       *   1. Go to Project Settings > Auth > SMTP Settings
+       *   2. Enable "Custom SMTP"
+       *   3. Set sender name to "ScanMark" and sender email to your domain
+       *   4. Configure SMTP host, port, username, password
+       *   5. Go to Auth > Email Templates > Reset Password
+       *   6. Customise the HTML template with ScanMark branding/logo
+       *   7. The {{ .ConfirmationURL }} variable inserts the reset link
+       */
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(
         email,
-        {
-          redirectTo: `${window.location.origin}/reset-password`,
-        },
+        { redirectTo: `${window.location.origin}/reset-password` },
       )
       if (resetError) throw resetError
+
+      // Always show the same message to prevent email enumeration
       setSent(true)
     } catch (err) {
       const msg = err?.message || ''
       if (msg.toLowerCase().includes('rate limit')) {
         setError('Too many requests. Please wait a moment and try again.')
       } else {
-        setError(msg || 'Could not send reset email. Please try again.')
+        // Privacy-safe: don't reveal whether the email exists
+        setSent(true)
       }
     } finally {
       setSending(false)
@@ -86,14 +97,14 @@ export function ForgotPasswordPage() {
               onChange={(e) => setInput(e.target.value)}
               className="mt-1 sm-input"
               placeholder="e.g. 22CS0123 or you@example.com"
-              autoComplete="username"
+              autoComplete="email"
               required
             />
           </div>
 
           {sent ? (
             <div className="rounded-lg border border-green-200 bg-green-50 p-3 text-sm text-green-800">
-              Password reset link sent! Check your email inbox (and spam folder).
+              If this email is registered, a reset link has been sent. Please check your inbox and spam folder.
             </div>
           ) : null}
           {error ? <div className="text-sm text-red-600">{error}</div> : null}
