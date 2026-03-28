@@ -53,7 +53,36 @@ async function scan(req, res, next) {
       return respondSupabaseError(res, insertError, 400)
     }
 
-    return res.status(201).json({ status: 'present' })
+    // Fetch lecture details for the success response
+    const { data: subjectRow } = await admin
+      .from('subjects')
+      .select('code, name')
+      .eq('id', body.subjectId)
+      .maybeSingle()
+
+    const { data: sessionRow } = await admin
+      .from('sessions')
+      .select('starts_at, faculty_user_id')
+      .eq('id', body.sessionId)
+      .maybeSingle()
+
+    let facultyName = null
+    if (sessionRow?.faculty_user_id) {
+      const { data: facRow } = await admin
+        .from('users')
+        .select('name')
+        .eq('id', sessionRow.faculty_user_id)
+        .maybeSingle()
+      facultyName = facRow?.name || null
+    }
+
+    return res.status(201).json({
+      status: 'present',
+      subjectCode: subjectRow?.code || null,
+      subjectName: subjectRow?.name || null,
+      facultyName,
+      sessionDate: sessionRow?.starts_at || null,
+    })
   } catch (err) {
     return next(err)
   }

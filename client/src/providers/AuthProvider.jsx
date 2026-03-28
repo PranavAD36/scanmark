@@ -43,6 +43,9 @@ export function AuthProvider({ children }) {
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
 
+  // Dedup concurrent /auth/me fetches
+  const profileFetchRef = { current: null }
+
   const refreshProfile = async () => {
     const { data } = await supabase.auth.getSession()
     const nextSession = data?.session || null
@@ -57,14 +60,20 @@ export function AuthProvider({ children }) {
     const cached = readProfileCache(nextSession.user?.id)
     if (cached) setProfile((prev) => prev || cached)
 
+    // Reuse in-flight request if one is already pending
+    if (!profileFetchRef.current) {
+      profileFetchRef.current = api.get('/auth/me').finally(() => {
+        profileFetchRef.current = null
+      })
+    }
+
     try {
-      const me = await api.get('/auth/me')
+      const me = await profileFetchRef.current
       setProfile(me.data)
       writeProfileCache(nextSession.user?.id, me.data)
       return me.data
     } catch (error) {
       console.error(error)
-      // Keep cached profile (if any) so refresh doesn't bounce the user to /login
       if (cached) return cached
       return null
     }
@@ -99,13 +108,20 @@ export function AuthProvider({ children }) {
 
         const cached = readProfileCache(nextSession.user?.id)
         if (cached) setProfile((prev) => prev || cached)
+
+        // Reuse in-flight request if refreshProfile() was already called
+        if (!profileFetchRef.current) {
+          profileFetchRef.current = api.get('/auth/me').finally(() => {
+            profileFetchRef.current = null
+          })
+        }
+
         try {
-          const me = await api.get('/auth/me')
+          const me = await profileFetchRef.current
           setProfile(me.data)
           writeProfileCache(nextSession.user?.id, me.data)
         } catch (error) {
           console.error(error)
-          // Keep cached profile if available
           if (!cached) setProfile(null)
         }
       },

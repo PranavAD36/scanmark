@@ -52,12 +52,6 @@ export function StudentAttendanceRecordsPage() {
             className="mt-1 sm-input"
           />
         </div>
-        <button
-          onClick={load}
-          className="w-full md:w-auto sm-btn-primary"
-        >
-          Load
-        </button>
       </div>
 
       {error ? <div className="text-sm text-red-600">{error}</div> : null}

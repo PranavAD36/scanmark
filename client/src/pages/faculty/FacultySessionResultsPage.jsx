@@ -83,12 +83,6 @@ export function FacultySessionResultsPage() {
             className="mt-1 sm-input"
           />
         </div>
-        <button
-          onClick={load}
-          className="sm-btn-primary"
-        >
-          Load
-        </button>
       </div>
 
       {error ? <div className="text-sm text-red-600">{error}</div> : null}

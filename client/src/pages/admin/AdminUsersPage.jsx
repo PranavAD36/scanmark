@@ -10,6 +10,7 @@ export function AdminUsersPage() {
   const [error, setError] = useState('')
   const [editUser, setEditUser] = useState(null)
   const [editForm, setEditForm] = useState({ name: '', email: '', idField: '', password: '' })
+  const [formErrors, setFormErrors] = useState({})
   const [saving, setSaving] = useState(false)
 
   const load = async () => {
@@ -50,11 +51,31 @@ export function AdminUsersPage() {
       idField: user.role === 'student' ? (user.college_id || '') : (user.faculty_id || ''),
       password: '',
     })
+    setFormErrors({})
     setError('')
+  }
+
+  const validateEditForm = () => {
+    const errs = {}
+    if (!editForm.name.trim()) errs.name = 'Name is required'
+    if (!editForm.email.trim()) {
+      errs.email = 'Email is required'
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(editForm.email.trim())) {
+      errs.email = 'Invalid email address'
+    }
+    if (!editForm.idField.trim()) errs.idField = `${editUser?.role === 'student' ? 'College' : 'Faculty'} ID is required`
+    if (editForm.password && editForm.password.length < 8) {
+      errs.password = 'Password must be at least 8 characters'
+    }
+    return errs
   }
 
   const saveEdit = async () => {
     if (!editUser) return
+    const errs = validateEditForm()
+    setFormErrors(errs)
+    if (Object.keys(errs).length) return
+
     setSaving(true)
     setError('')
     try {
@@ -202,6 +223,7 @@ export function AdminUsersPage() {
                   onChange={(e) => setEditForm((f) => ({ ...f, idField: e.target.value }))}
                   className="mt-1 sm-input"
                 />
+                {formErrors.idField ? <div className="text-xs text-red-600 mt-1">{formErrors.idField}</div> : null}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Name</label>
@@ -210,6 +232,7 @@ export function AdminUsersPage() {
                   onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value }))}
                   className="mt-1 sm-input"
                 />
+                {formErrors.name ? <div className="text-xs text-red-600 mt-1">{formErrors.name}</div> : null}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Email</label>
@@ -219,6 +242,7 @@ export function AdminUsersPage() {
                   className="mt-1 sm-input"
                   type="email"
                 />
+                {formErrors.email ? <div className="text-xs text-red-600 mt-1">{formErrors.email}</div> : null}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
@@ -233,6 +257,7 @@ export function AdminUsersPage() {
                   minLength={8}
                   autoComplete="new-password"
                 />
+                {formErrors.password ? <div className="text-xs text-red-600 mt-1">{formErrors.password}</div> : null}
               </div>
             </div>
             <div className="flex gap-2 justify-end pt-2">

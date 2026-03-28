@@ -61,7 +61,10 @@ export function LoginPage() {
       })
       if (setSessionError) throw setSessionError
 
-      const me = await refreshProfile()
+      // Use role from login response for instant navigation; refreshProfile
+      // runs in the background via onAuthStateChange.
+      const loginRole = res.data?.role
+      refreshProfile()
 
       const from = location.state?.from
       if (typeof from === 'string' && from.startsWith('/')) {
@@ -69,7 +72,7 @@ export function LoginPage() {
         return
       }
 
-      navigate(getDefaultPath(me?.role), { replace: true })
+      navigate(getDefaultPath(loginRole), { replace: true })
     } catch (err) {
       setError(toUserMessage(err))
     } finally {

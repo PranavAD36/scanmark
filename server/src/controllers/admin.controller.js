@@ -225,16 +225,22 @@ async function deleteUser(req, res, next) {
 async function updateUser(req, res, next) {
   try {
     const id = req.params.id
-    const body = z
+    const parsed = z
       .object({
-        name: z.string().min(1).optional(),
-        email: z.string().email().optional(),
-        collegeId: z.string().min(1).optional(),
-        facultyId: z.string().min(1).optional(),
-        password: z.string().min(8).optional(),
+        name: z.string().min(1, 'Name is required').optional(),
+        email: z.string().email('Invalid email address').optional(),
+        collegeId: z.string().min(1, 'College ID is required').optional(),
+        facultyId: z.string().min(1, 'Faculty ID is required').optional(),
+        password: z.string().min(8, 'Password must be at least 8 characters').optional(),
       })
-      .parse(req.body)
+      .safeParse(req.body)
 
+    if (!parsed.success) {
+      const firstIssue = parsed.error.issues[0]
+      return res.status(400).json({ error: firstIssue?.message || 'Validation failed' })
+    }
+
+    const body = parsed.data
     const admin = getSupabaseAdmin()
 
     const { data: user, error: fetchErr } = await admin

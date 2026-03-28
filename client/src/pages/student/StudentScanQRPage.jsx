@@ -8,6 +8,7 @@ export function StudentScanQRPage() {
 
   const [scanning, setScanning] = useState(false)
   const [status, setStatus] = useState('')
+  const [scanResult, setScanResult] = useState(null)
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -23,6 +24,7 @@ export function StudentScanQRPage() {
   const startScan = async () => {
     setError('')
     setStatus('')
+    setScanResult(null)
 
     if (scanning) return
 
@@ -49,6 +51,7 @@ export function StudentScanQRPage() {
             }
 
             const res = await api.post('/attendance/scan', { sessionId, subjectId })
+            setScanResult(res.data)
             setStatus(`Attendance marked: ${res.data.status}`)
           } catch (e) {
             setError(e?.response?.data?.error || e.message)
@@ -79,6 +82,20 @@ export function StudentScanQRPage() {
 
         {status ? <div className="text-sm text-green-700">{status}</div> : null}
         {error ? <div className="text-sm text-red-600">{error}</div> : null}
+
+        {scanResult ? (
+          <div className="rounded-lg border border-green-200 bg-green-50 p-3 space-y-1 text-sm">
+            {scanResult.subjectCode ? (
+              <div><span className="font-medium text-slate-700">Subject:</span> {scanResult.subjectCode}{scanResult.subjectName ? ` — ${scanResult.subjectName}` : ''}</div>
+            ) : null}
+            {scanResult.facultyName ? (
+              <div><span className="font-medium text-slate-700">Faculty:</span> {scanResult.facultyName}</div>
+            ) : null}
+            {scanResult.sessionDate ? (
+              <div><span className="font-medium text-slate-700">Date/Time:</span> {new Date(scanResult.sessionDate).toLocaleString()}</div>
+            ) : null}
+          </div>
+        ) : null}
 
         <div className="mt-2">
           <div id={elementId} className="w-full max-w-md mx-auto" />

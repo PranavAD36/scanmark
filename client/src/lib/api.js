@@ -15,7 +15,7 @@ function normalizeApiBaseUrl(input) {
 
 export const api = axios.create({
   baseURL: normalizeApiBaseUrl(import.meta.env.VITE_API_URL),
-  timeout: 15000,
+  timeout: 20000,
 })
 
 api.interceptors.request.use((config) => {

@@ -265,7 +265,7 @@ async function results(req, res, next) {
     const { data, error } = await admin
       .from('sessions')
       .select(
-        'id, subject_id, starts_at, ends_at, duration_minutes, subjects(code)',
+        'id, subject_id, starts_at, ends_at, duration_minutes, present_count, absent_count, attendance_percent, subjects(code)',
       )
       .eq('faculty_user_id', req.profile.id)
       .eq('status', 'ended')
@@ -282,11 +282,12 @@ async function results(req, res, next) {
     const sessionIds = data.map((s) => s.id)
     const subjectIds = [...new Set(data.map((s) => s.subject_id))]
 
-    // Batch-fetch attendance for all sessions
+    // Batch-fetch attendance for all sessions (only present records)
     const { data: attData, error: attError } = await admin
       .from('attendance')
       .select('session_id, student_user_id')
       .in('session_id', sessionIds)
+      .eq('status', 'present')
 
     if (attError) return respondSupabaseError(res, attError)
 
@@ -351,10 +352,11 @@ async function results(req, res, next) {
       // Ensure every present student is counted in total
       for (const pid of presentIds) registered.add(pid)
 
-      const total = registered.size
-      const presentCount = presentIds.size
-      const absentCount = total - presentCount
-      const pct = total > 0 ? Math.round((presentCount / total) * 100) : 0
+      // Prefer stored finalized counts from session end if available
+      const total = s.present_count != null ? (s.present_count + s.absent_count) : registered.size
+      const presentCount = s.present_count != null ? s.present_count : presentIds.size
+      const absentCount = s.absent_count != null ? s.absent_count : (total - presentCount)
+      const pct = s.attendance_percent != null ? s.attendance_percent : (total > 0 ? Math.round((presentCount / total) * 100) : 0)
 
       const presentStudents = [...presentIds].map(
         (id) => studentDetails.get(id) || { college_id: id },
