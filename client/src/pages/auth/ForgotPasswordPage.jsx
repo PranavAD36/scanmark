@@ -1,22 +1,48 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase.js'
-import { resolveLoginEmail } from '../../lib/api.js'
+import { api } from '../../lib/api.js'
 
 export function ForgotPasswordPage() {
-  const [collegeId, setCollegeId] = useState('')
+  const [input, setInput] = useState('')
   const [sending, setSending] = useState(false)
-  const [status, setStatus] = useState('')
+  const [sent, setSent] = useState(false)
   const [error, setError] = useState('')
 
   const onSubmit = async (e) => {
     e.preventDefault()
     setError('')
-    setStatus('')
+    setSent(false)
+    const trimmed = input.trim()
+    if (!trimmed) {
+      setError('Please enter your College ID or email.')
+      return
+    }
     setSending(true)
 
     try {
-      const email = await resolveLoginEmail(collegeId.trim())
+      // Resolve college/faculty ID to email via backend
+      let email = trimmed
+      if (!trimmed.includes('@')) {
+        try {
+          const res = await api.post('/auth/resolve-login', { collegeId: trimmed })
+          email = res.data.email
+        } catch (resolveErr) {
+          const status = resolveErr?.response?.status
+          if (status === 404) {
+            setError('No account found for that ID. Please check and try again.')
+            return
+          }
+          throw resolveErr
+        }
+      }
+
+      // Basic email format check
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        setError('Invalid email address. Please check and try again.')
+        return
+      }
+
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(
         email,
         {
@@ -24,9 +50,14 @@ export function ForgotPasswordPage() {
         },
       )
       if (resetError) throw resetError
-      setStatus('Password reset link sent (check your email).')
+      setSent(true)
     } catch (err) {
-      setError(err?.message || 'Could not send reset email')
+      const msg = err?.message || ''
+      if (msg.toLowerCase().includes('rate limit')) {
+        setError('Too many requests. Please wait a moment and try again.')
+      } else {
+        setError(msg || 'Could not send reset email. Please try again.')
+      }
     } finally {
       setSending(false)
     }
@@ -38,25 +69,33 @@ export function ForgotPasswordPage() {
         onSubmit={onSubmit}
         className="w-full max-w-md sm-card p-6 shadow-sm"
       >
-        <div className="text-xl font-semibold text-slate-900">Reset password</div>
+        <div className="text-2xl font-semibold text-slate-900">
+          <span className="text-blue-700">Scan</span>Mark
+        </div>
         <div className="mt-1 text-sm text-slate-600">
-          Enter your College ID to receive a reset email.
+          Enter your College ID or registered email to receive a password reset link.
         </div>
 
         <div className="mt-6 space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              College ID (or Email)
+              College ID or Email
             </label>
             <input
-              value={collegeId}
-              onChange={(e) => setCollegeId(e.target.value)}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
               className="mt-1 sm-input"
+              placeholder="e.g. 22CS0123 or you@example.com"
+              autoComplete="username"
               required
             />
           </div>
 
-          {status ? <div className="text-sm text-green-700">{status}</div> : null}
+          {sent ? (
+            <div className="rounded-lg border border-green-200 bg-green-50 p-3 text-sm text-green-800">
+              Password reset link sent! Check your email inbox (and spam folder).
+            </div>
+          ) : null}
           {error ? <div className="text-sm text-red-600">{error}</div> : null}
 
           <button
@@ -64,7 +103,7 @@ export function ForgotPasswordPage() {
             disabled={sending}
             className="w-full sm-btn-primary"
           >
-            {sending ? 'Sending…' : 'Send reset email'}
+            {sending ? 'Sending…' : 'Send reset link'}
           </button>
 
           <div className="text-sm text-slate-600">
