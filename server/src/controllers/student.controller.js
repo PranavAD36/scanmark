@@ -36,6 +36,7 @@ async function dashboard(req, res, next) {
       .from('attendance')
       .select('id, session_id')
       .eq('student_user_id', req.profile.id)
+      .eq('status', 'present')
       .in('session_id', sessionIdsToday.length ? sessionIdsToday : ['00000000-0000-0000-0000-000000000000'])
 
     if (aError) return respondSupabaseError(res, aError)
@@ -65,8 +66,10 @@ async function dashboard(req, res, next) {
 
     const { count: presentSessionsCount, error: presentError } = await admin
       .from('attendance')
-      .select('id', { count: 'exact', head: true })
+      .select('id, sessions!inner(status)', { count: 'exact', head: true })
       .eq('student_user_id', req.profile.id)
+      .eq('status', 'present')
+      .eq('sessions.status', 'ended')
       .in('subject_id', allSubjectIds.length ? allSubjectIds : ['00000000-0000-0000-0000-000000000000'])
 
     if (presentError) return respondSupabaseError(res, presentError)

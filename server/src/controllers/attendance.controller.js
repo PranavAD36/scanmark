@@ -251,6 +251,7 @@ async function summary(req, res, next) {
         .select('id, sessions!inner(status)', { count: 'exact', head: true })
         .eq('student_user_id', req.profile.id)
         .eq('subject_id', subjectId)
+        .eq('status', 'present')
         .eq('sessions.status', 'ended')
 
       if (presentError) return respondSupabaseError(res, presentError)
