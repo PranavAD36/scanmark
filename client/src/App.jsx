@@ -13,6 +13,7 @@ import { AdminStudentsPage } from './pages/admin/AdminStudentsPage.jsx'
 import { AdminFacultyPage } from './pages/admin/AdminFacultyPage.jsx'
 import { AdminSubjectsPage } from './pages/admin/AdminSubjectsPage.jsx'
 import { AdminUsersPage } from './pages/admin/AdminUsersPage.jsx'
+import { Reports } from './pages/admin/Reports.jsx'
 
 import { FacultyDashboardPage } from './pages/faculty/FacultyDashboardPage.jsx'
 import { FacultyQRSessionPage } from './pages/faculty/FacultyQRSessionPage.jsx'
@@ -35,6 +36,10 @@ function App() {
           <Route path="/reset-password" element={<ResetPasswordPage />} />
 
           <Route element={<RequireAuth />}>
+            <Route path="/reports" element={<DashboardLayout />}>
+              <Route index element={<Reports />} />
+            </Route>
+
             <Route
               path="/admin"
               element={

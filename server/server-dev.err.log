@@ -1,0 +1,148 @@
+Error: Not allowed by CORS
+    at origin (S:\project\sgp1\server\src\server.js:44:19)
+    at S:\project\sgp1\server\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (S:\project\sgp1\server\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (S:\project\sgp1\server\node_modules\cors\lib\index.js:204:7)
+    at Layer.handleRequest (S:\project\sgp1\server\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (S:\project\sgp1\server\node_modules\router\index.js:342:13)
+    at S:\project\sgp1\server\node_modules\router\index.js:297:9
+    at processParams (S:\project\sgp1\server\node_modules\router\index.js:582:12)
+    at next (S:\project\sgp1\server\node_modules\router\index.js:291:5)
+    at read (S:\project\sgp1\server\node_modules\body-parser\lib\read.js:53:5) {
+  status: 403
+}
+Error: Not allowed by CORS
+    at origin (S:\project\sgp1\server\src\server.js:44:19)
+    at S:\project\sgp1\server\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (S:\project\sgp1\server\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (S:\project\sgp1\server\node_modules\cors\lib\index.js:204:7)
+    at Layer.handleRequest (S:\project\sgp1\server\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (S:\project\sgp1\server\node_modules\router\index.js:342:13)
+    at S:\project\sgp1\server\node_modules\router\index.js:297:9
+    at processParams (S:\project\sgp1\server\node_modules\router\index.js:582:12)
+    at next (S:\project\sgp1\server\node_modules\router\index.js:291:5)
+    at read (S:\project\sgp1\server\node_modules\body-parser\lib\read.js:53:5) {
+  status: 403
+}
+Error: Not allowed by CORS
+    at origin (S:\project\sgp1\server\src\server.js:44:19)
+    at S:\project\sgp1\server\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (S:\project\sgp1\server\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (S:\project\sgp1\server\node_modules\cors\lib\index.js:204:7)
+    at Layer.handleRequest (S:\project\sgp1\server\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (S:\project\sgp1\server\node_modules\router\index.js:342:13)
+    at S:\project\sgp1\server\node_modules\router\index.js:297:9
+    at processParams (S:\project\sgp1\server\node_modules\router\index.js:582:12)
+    at next (S:\project\sgp1\server\node_modules\router\index.js:291:5)
+    at read (S:\project\sgp1\server\node_modules\body-parser\lib\read.js:53:5) {
+  status: 403
+}
+Error: Not allowed by CORS
+    at origin (S:\project\sgp1\server\src\server.js:44:19)
+    at S:\project\sgp1\server\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (S:\project\sgp1\server\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (S:\project\sgp1\server\node_modules\cors\lib\index.js:204:7)
+    at Layer.handleRequest (S:\project\sgp1\server\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (S:\project\sgp1\server\node_modules\router\index.js:342:13)
+    at S:\project\sgp1\server\node_modules\router\index.js:297:9
+    at processParams (S:\project\sgp1\server\node_modules\router\index.js:582:12)
+    at next (S:\project\sgp1\server\node_modules\router\index.js:291:5)
+    at read (S:\project\sgp1\server\node_modules\body-parser\lib\read.js:53:5) {
+  status: 403
+}
+Error: Not allowed by CORS
+    at origin (S:\project\sgp1\server\src\server.js:44:19)
+    at S:\project\sgp1\server\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (S:\project\sgp1\server\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (S:\project\sgp1\server\node_modules\cors\lib\index.js:204:7)
+    at Layer.handleRequest (S:\project\sgp1\server\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (S:\project\sgp1\server\node_modules\router\index.js:342:13)
+    at S:\project\sgp1\server\node_modules\router\index.js:297:9
+    at processParams (S:\project\sgp1\server\node_modules\router\index.js:582:12)
+    at next (S:\project\sgp1\server\node_modules\router\index.js:291:5)
+    at read (S:\project\sgp1\server\node_modules\body-parser\lib\read.js:53:5) {
+  status: 403
+}
+Error: Not allowed by CORS
+    at origin (S:\project\sgp1\server\src\server.js:44:19)
+    at S:\project\sgp1\server\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (S:\project\sgp1\server\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (S:\project\sgp1\server\node_modules\cors\lib\index.js:204:7)
+    at Layer.handleRequest (S:\project\sgp1\server\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (S:\project\sgp1\server\node_modules\router\index.js:342:13)
+    at S:\project\sgp1\server\node_modules\router\index.js:297:9
+    at processParams (S:\project\sgp1\server\node_modules\router\index.js:582:12)
+    at next (S:\project\sgp1\server\node_modules\router\index.js:291:5)
+    at read (S:\project\sgp1\server\node_modules\body-parser\lib\read.js:53:5) {
+  status: 403
+}
+Error: Not allowed by CORS
+    at origin (S:\project\sgp1\server\src\server.js:44:19)
+    at S:\project\sgp1\server\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (S:\project\sgp1\server\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (S:\project\sgp1\server\node_modules\cors\lib\index.js:204:7)
+    at Layer.handleRequest (S:\project\sgp1\server\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (S:\project\sgp1\server\node_modules\router\index.js:342:13)
+    at S:\project\sgp1\server\node_modules\router\index.js:297:9
+    at processParams (S:\project\sgp1\server\node_modules\router\index.js:582:12)
+    at next (S:\project\sgp1\server\node_modules\router\index.js:291:5)
+    at read (S:\project\sgp1\server\node_modules\body-parser\lib\read.js:53:5) {
+  status: 403
+}
+Error: Not allowed by CORS
+    at origin (S:\project\sgp1\server\src\server.js:44:19)
+    at S:\project\sgp1\server\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (S:\project\sgp1\server\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (S:\project\sgp1\server\node_modules\cors\lib\index.js:204:7)
+    at Layer.handleRequest (S:\project\sgp1\server\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (S:\project\sgp1\server\node_modules\router\index.js:342:13)
+    at S:\project\sgp1\server\node_modules\router\index.js:297:9
+    at processParams (S:\project\sgp1\server\node_modules\router\index.js:582:12)
+    at next (S:\project\sgp1\server\node_modules\router\index.js:291:5)
+    at read (S:\project\sgp1\server\node_modules\body-parser\lib\read.js:53:5) {
+  status: 403
+}
+Error: Not allowed by CORS
+    at origin (S:\project\sgp1\server\src\server.js:44:19)
+    at S:\project\sgp1\server\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (S:\project\sgp1\server\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (S:\project\sgp1\server\node_modules\cors\lib\index.js:204:7)
+    at Layer.handleRequest (S:\project\sgp1\server\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (S:\project\sgp1\server\node_modules\router\index.js:342:13)
+    at S:\project\sgp1\server\node_modules\router\index.js:297:9
+    at processParams (S:\project\sgp1\server\node_modules\router\index.js:582:12)
+    at next (S:\project\sgp1\server\node_modules\router\index.js:291:5)
+    at read (S:\project\sgp1\server\node_modules\body-parser\lib\read.js:53:5) {
+  status: 403
+}
+Error: Not allowed by CORS
+    at origin (S:\project\sgp1\server\src\server.js:44:19)
+    at S:\project\sgp1\server\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (S:\project\sgp1\server\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (S:\project\sgp1\server\node_modules\cors\lib\index.js:204:7)
+    at Layer.handleRequest (S:\project\sgp1\server\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (S:\project\sgp1\server\node_modules\router\index.js:342:13)
+    at S:\project\sgp1\server\node_modules\router\index.js:297:9
+    at processParams (S:\project\sgp1\server\node_modules\router\index.js:582:12)
+    at next (S:\project\sgp1\server\node_modules\router\index.js:291:5)
+    at read (S:\project\sgp1\server\node_modules\body-parser\lib\read.js:53:5) {
+  status: 403
+}
+Error: Not allowed by CORS
+    at origin (S:\project\sgp1\server\src\server.js:44:19)
+    at S:\project\sgp1\server\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (S:\project\sgp1\server\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (S:\project\sgp1\server\node_modules\cors\lib\index.js:204:7)
+    at Layer.handleRequest (S:\project\sgp1\server\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (S:\project\sgp1\server\node_modules\router\index.js:342:13)
+    at S:\project\sgp1\server\node_modules\router\index.js:297:9
+    at processParams (S:\project\sgp1\server\node_modules\router\index.js:582:12)
+    at next (S:\project\sgp1\server\node_modules\router\index.js:291:5)
+    at read (S:\project\sgp1\server\node_modules\body-parser\lib\read.js:53:5) {
+  status: 403
+}
+[auth/login] invalid credentials {
+  loginId: 'fac001',
+  email: 'fac001@scanmark.demo',
+  usedFallback: false
+}

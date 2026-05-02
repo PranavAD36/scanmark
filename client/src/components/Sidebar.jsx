@@ -31,6 +31,7 @@ export function Sidebar() {
           { to: '/admin/faculty', label: 'Add Faculty' },
           { to: '/admin/subjects', label: 'Manage Subjects' },
           { to: '/admin/users', label: 'Manage Users' },
+          { to: '/reports', label: 'Reports' },
         ]
       : role === 'faculty'
         ? [
@@ -38,6 +39,7 @@ export function Sidebar() {
             { to: '/faculty/qr-session', label: 'QR Session' },
             { to: '/faculty/session-results', label: 'Session Results' },
             { to: '/faculty/manual-attendance', label: 'Manual Attendance' },
+            { to: '/reports', label: 'Reports' },
           ]
         : [
             { to: '/student', label: 'Dashboard' },

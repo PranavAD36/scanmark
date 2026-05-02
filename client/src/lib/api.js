@@ -7,7 +7,7 @@ export function setApiAuthToken(nextToken) {
 }
 
 function normalizeApiBaseUrl(input) {
-  if (!input) return 'http://localhost:4000/api'
+  if (!input) return "http://localhost:10000/api";
   const trimmed = String(input).replace(/\/+$/, '')
   if (trimmed.endsWith('/api')) return trimmed
   return `${trimmed}/api`

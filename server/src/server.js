@@ -11,6 +11,7 @@ const subjectRoutes = require('./routes/subjects.routes')
 const sessionRoutes = require('./routes/sessions.routes')
 const attendanceRoutes = require('./routes/attendance.routes')
 const timetableRoutes = require('./routes/timetable.routes')
+const reportsRoutes = require('./routes/reports.routes')
 
 const { notFound } = require('./middleware/notFound')
 const { errorHandler } = require('./middleware/errorHandler')
@@ -23,6 +24,7 @@ function createServer() {
 
   const defaultAllowedOrigins = [
     'http://localhost:5173',
+    'http://localhost:5174',
     'https://scanmark-sage.vercel.app',
   ]
 
@@ -68,6 +70,7 @@ function createServer() {
   app.use('/api/sessions', sessionRoutes)
   app.use('/api/attendance', attendanceRoutes)
   app.use('/api/timetable', timetableRoutes)
+  app.use('/api/reports', reportsRoutes)
 
   app.use(notFound)
   app.use(errorHandler)

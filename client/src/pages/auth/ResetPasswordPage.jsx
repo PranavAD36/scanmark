@@ -240,13 +240,3 @@ export function ResetPasswordPage() {
     </div>
   )
 }
-        )}
-      </form>
-    </div>
-  )
-}
-        )}
-      </form>
-    </div>
-  )
-}

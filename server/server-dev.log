@@ -1,0 +1,212 @@
+
+> server@1.0.0 dev
+> nodemon src/index.js
+
+[33m[nodemon] 3.1.14[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching path(s): *.*[39m
+[33m[nodemon] watching extensions: js,mjs,cjs,json[39m
+[32m[nodemon] starting `node src/index.js`[39m
+[dotenv@17.3.1] injecting env (4) from .env -- tip: ⚡️ secrets for agents: https://dotenvx.com/as2
+ScanMark API listening on http://localhost:10000
+[0mGET /health [32m200[0m 2.381 ms - 11[0m
+[0mGET /health [32m200[0m 0.290 ms - 11[0m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+[dotenv@17.3.1] injecting env (4) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+ScanMark API listening on http://localhost:10000
+[0mGET /health [32m200[0m 2.099 ms - 11[0m
+[0mGET /api/reports/attendance [33m401[0m 0.636 ms - 32[0m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+[dotenv@17.3.1] injecting env (4) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+ScanMark API listening on http://localhost:10000
+[32m[nodemon] clean exit - waiting for changes before restart[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+[dotenv@17.3.1] injecting env (4) from .env -- tip: 🤖 agentic secret storage: https://dotenvx.com/as2
+ScanMark API listening on http://localhost:10000
+[0mPOST /api/auth/login [32m200[0m 2205.320 ms - 1011[0m
+[0mGET /api/auth/me [32m200[0m 477.992 ms - 203[0m
+[0mGET /api/auth/me [36m304[0m 1096.711 ms - -[0m
+[0mGET /api/attendance/summary [32m200[0m 3457.530 ms - 456[0m
+[0mGET /api/attendance/summary [33m401[0m 172.029 ms - 25[0m
+[0mPOST /api/auth/login [32m200[0m 642.474 ms - 1011[0m
+[0mGET /api/auth/me [32m200[0m 138.075 ms - 205[0m
+[0mGET /api/faculty/dashboard [32m200[0m 203.185 ms - 77[0m
+[0mGET /api/auth/me [36m304[0m 147.052 ms - -[0m
+[0mGET /api/faculty/dashboard [36m304[0m 290.288 ms - -[0m
+[0mGET /api/sessions/results?from=2026-05-01T18:30:00.000Z&to=2026-05-02T18:29:59.999Z [32m200[0m 457.445 ms - 15[0m
+[0mGET /api/sessions/results?from=2026-05-01T18:30:00.000Z&to=2026-05-02T18:29:59.999Z [36m304[0m 203.781 ms - -[0m
+[0mGET /api/sessions/active [32m200[0m 284.510 ms - 15[0m
+[0mGET /api/sessions/active [36m304[0m 343.668 ms - -[0m
+[0mGET /api/sessions/results?from=2026-05-01T18:30:00.000Z&to=2026-05-02T18:29:59.999Z [36m304[0m 278.162 ms - -[0m
+[0mGET /api/sessions/results?from=2026-05-01T18:30:00.000Z&to=2026-05-02T18:29:59.999Z [36m304[0m 242.161 ms - -[0m
+[0mGET /api/sessions/active [36m304[0m 218.042 ms - -[0m
+[0mGET /api/subjects [32m200[0m 371.838 ms - 429[0m
+[0mGET /api/sessions/active [36m304[0m 380.118 ms - -[0m
+[0mGET /api/subjects [36m304[0m 322.998 ms - -[0m
+[0mGET /api/faculty/dashboard [36m304[0m 305.355 ms - -[0m
+[0mGET /api/faculty/dashboard [36m304[0m 193.005 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 1096.534 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 278.273 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 216.238 ms - -[0m
+[0mGET /api/reports/attendance?type=month [32m200[0m 504.348 ms - 849[0m
+[0mGET /api/reports/attendance?type=month [32m200[0m 457.329 ms - 849[0m
+[0mGET /api/sessions/active [36m304[0m 415.915 ms - -[0m
+[0mGET /api/sessions/active [36m304[0m 277.380 ms - -[0m
+[0mGET /api/reports/attendance?type=month [32m200[0m 363.017 ms - 849[0m
+[0mGET /api/reports/attendance?type=month [32m200[0m 339.476 ms - 849[0m
+[0mGET /api/reports/attendance?type=month&belowPercent=50 [32m200[0m 925.341 ms - 591[0m
+[0mGET /api/reports/attendance?type=month&belowPercent=5 [32m200[0m 1399.322 ms - 591[0m
+[0mGET /api/reports/attendance?type=month&belowPercent=5 [32m200[0m 416.959 ms - 591[0m
+[0mGET /api/reports/attendance?type=month [32m200[0m 346.361 ms - 849[0m
+[0mGET /api/reports/attendance?type=month&belowPercent=7 [32m200[0m 413.849 ms - 591[0m
+[0mGET /api/reports/attendance?type=month&belowPercent=75 [32m200[0m 779.754 ms - 849[0m
+[0mGET /api/reports/attendance?type=month&belowPercent=7 [32m200[0m 395.991 ms - 591[0m
+[0mGET /api/reports/attendance?type=month [32m200[0m 346.072 ms - 849[0m
+[0mGET /api/reports/attendance?type=month&studentId=2 [32m200[0m 355.707 ms - 334[0m
+[0mGET /api/reports/attendance?type=month&studentId=24 [32m200[0m 305.772 ms - 334[0m
+[0mGET /api/reports/attendance?type=month&studentId=24c [32m200[0m 286.717 ms - 334[0m
+[0mGET /api/reports/attendance?type=month&studentId=24ce [32m200[0m 290.560 ms - 334[0m
+[0mGET /api/reports/attendance?type=month&studentId=24ce0 [32m200[0m 253.701 ms - 334[0m
+[0mGET /api/reports/attendance?type=month&studentId=24ce02 [32m200[0m 271.387 ms - 334[0m
+[0mGET /api/reports/attendance?type=month&studentId=24ce020 [32m200[0m 315.225 ms - 591[0m
+[0mGET /api/reports/attendance?type=month&studentId=24ce02 [32m200[0m 403.188 ms - 334[0m
+[0mGET /api/reports/attendance?type=month&studentId=24ce021 [32m200[0m 254.766 ms - 334[0m
+[0mGET /api/auth/me [36m304[0m 1747.619 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 297.112 ms - -[0m
+[0mPOST /api/auth/login [32m200[0m 1747.626 ms - 1011[0m
+[0mGET /api/auth/me [36m304[0m 486.348 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 269.009 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 525.233 ms - -[0m
+[0mGET /api/faculty/dashboard [36m304[0m 1417.484 ms - -[0m
+[0mGET /api/faculty/dashboard [36m304[0m 442.708 ms - -[0m
+[0mGET /api/reports/attendance?type=month [32m200[0m 891.763 ms - 849[0m
+[0mGET /api/reports/attendance?type=month [32m200[0m 782.286 ms - 849[0m
+[0mGET /api/auth/me [36m304[0m 328.567 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 139.701 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 252.228 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 166.052 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 148.195 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 141.272 ms - -[0m
+[0mPOST /api/auth/login [32m200[0m 566.665 ms - 1011[0m
+[0mGET /api/auth/me [32m200[0m 133.738 ms - 203[0m
+[0mGET /api/auth/me [36m304[0m 138.236 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 153.728 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 140.454 ms - -[0m
+[0mGET /api/attendance/summary [36m304[0m 2521.152 ms - -[0m
+[0mGET /api/attendance/summary [36m304[0m 2313.001 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 560.740 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 123.625 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 233.246 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 202.744 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 121.615 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 121.824 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 263.054 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 158.926 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 149.766 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 163.474 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 137.064 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 139.101 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 821.188 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 189.010 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 171.529 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 749.732 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 191.330 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 130.428 ms - -[0m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+[dotenv@17.3.1] injecting env (4) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+ScanMark API listening on http://localhost:10000
+[32m[nodemon] clean exit - waiting for changes before restart[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+[dotenv@17.3.1] injecting env (4) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+ScanMark API listening on http://localhost:10000
+[0mGET /api/auth/me [36m304[0m 1253.233 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 202.698 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 139.166 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 167.643 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 168.241 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 202.046 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 152.979 ms - -[0m
+[0mGET /api/reports/attendance?type=month [33m403[0m 157.353 ms - 21[0m
+[0mGET /api/reports/attendance?type=month [33m403[0m 152.065 ms - 21[0m
+[0mGET /api/auth/me [36m304[0m 741.280 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 477.359 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 206.616 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 166.432 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 167.092 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 340.057 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 156.595 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 224.239 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 166.921 ms - -[0m
+[0mGET /api/attendance/summary [36m304[0m 3298.095 ms - -[0m
+[0mGET /api/attendance/summary [36m304[0m 2136.639 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 408.450 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 134.786 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 174.121 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 203.739 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 240.943 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 146.447 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 129.385 ms - -[0m
+[0mGET /api/reports/attendance?type=month [33m403[0m 251.230 ms - 21[0m
+[0mGET /api/reports/attendance?type=month [33m403[0m 165.351 ms - 21[0m
+[0mGET /api/attendance/summary [36m304[0m 1577.287 ms - -[0m
+[0mGET /api/attendance/summary [36m304[0m 1679.584 ms - -[0m
+[0mGET /api/attendance/records?from=2026-05-01T18:30:00.000Z&to=2026-05-02T18:29:59.999Z [32m200[0m 853.231 ms - 14[0m
+[0mGET /api/attendance/records?from=2026-05-01T18:30:00.000Z&to=2026-05-02T18:29:59.999Z [36m304[0m 223.045 ms - -[0m
+[0mGET /api/timetable?date=2026-05-02 [32m200[0m 371.155 ms - 12[0m
+[0mGET /api/timetable?date=2026-05-02 [36m304[0m 215.826 ms - -[0m
+[0mGET /api/attendance/summary [36m304[0m 1230.216 ms - -[0m
+[0mGET /api/attendance/summary [36m304[0m 1715.134 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 321.258 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 168.784 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 206.132 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 163.490 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 247.030 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 174.322 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 191.001 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 152.129 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 233.659 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 424.584 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 142.634 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 148.179 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 139.118 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 148.130 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 142.103 ms - -[0m
+[0mPOST /api/auth/login [33m401[0m 564.977 ms - 31[0m
+[0mPOST /api/auth/login [32m200[0m 484.274 ms - 1011[0m
+[0mGET /api/auth/me [32m200[0m 142.415 ms - 205[0m
+[0mGET /api/auth/me [36m304[0m 326.698 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 187.730 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 153.843 ms - -[0m
+[0mGET /api/faculty/dashboard [36m304[0m 719.474 ms - -[0m
+[0mGET /api/faculty/dashboard [36m304[0m 204.793 ms - -[0m
+[0mGET /api/reports/attendance?type=month [32m200[0m 393.123 ms - 848[0m
+[0mGET /api/reports/attendance?type=month [32m200[0m 426.009 ms - 848[0m
+[0mGET /api/auth/me [36m304[0m 136.739 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 139.289 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 133.358 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 122.551 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 122.822 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 137.996 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 133.041 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 142.176 ms - -[0m
+[0mGET /api/auth/me [36m304[0m 128.412 ms - -[0m
+[0mGET /api/reports/attendance?type=month&studentId=2 [32m200[0m 423.300 ms - 334[0m
+[0mGET /api/reports/attendance?type=month&studentId=24 [32m200[0m 460.174 ms - 334[0m
+[0mGET /api/reports/attendance?type=month&studentId=24c [32m200[0m 458.479 ms - 334[0m
+[0mGET /api/reports/attendance?type=month&studentId=24ce0 [32m200[0m 285.891 ms - 334[0m
+[0mGET /api/reports/attendance?type=month&studentId=24ce [32m200[0m 510.388 ms - 334[0m
+[0mGET /api/reports/attendance?type=month&studentId=24ce02 [32m200[0m 297.701 ms - 334[0m
+[0mGET /api/reports/attendance?type=month&studentId=24ce020 [32m200[0m 395.706 ms - 590[0m
+[0mGET /api/reports/attendance?type=month&studentId=24ce020&belowPercent=5 [32m200[0m 651.880 ms - 334[0m
+[0mGET /api/reports/attendance?type=month&studentId=24ce020&belowPercent=50 [32m200[0m 443.399 ms - 334[0m
+[0mGET /api/reports/attendance?type=month&belowPercent=50 [32m200[0m 473.087 ms - 591[0m
+[0mGET /api/auth/me [0m-[0m - ms - -[0m
+[0mGET /api/auth/me [0m-[0m - ms - -[0m
+[0mGET /api/auth/me [0m-[0m - ms - -[0m

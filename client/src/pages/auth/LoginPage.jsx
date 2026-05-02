@@ -102,7 +102,7 @@ export function LoginPage() {
               value={collegeId}
               onChange={(e) => setCollegeId(e.target.value)}
               className="mt-1 sm-input"
-              placeholder="e.g. 22CS0123"
+              placeholder="Enter ID"
               autoComplete="username"
               required
             />
@@ -117,6 +117,7 @@ export function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               className="mt-1 sm-input"
               type="password"
+              placeholder="Enter Password"
               autoComplete="current-password"
               required
             />
