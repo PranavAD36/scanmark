@@ -93,6 +93,21 @@ export function LoginPage() {
           Sign in with College ID and password.
         </div>
 
+        <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
+          <div className="font-semibold text-slate-900 mb-2">Sample credentials</div>
+          <div className="space-y-2">
+            <div>
+              <span className="font-medium">Admin:</span> admin@example.com / Password123
+            </div>
+            <div>
+              <span className="font-medium">Faculty:</span> faculty01@example.com / Password123
+            </div>
+            <div>
+              <span className="font-medium">Student:</span> student01@example.com / Password123
+            </div>
+          </div>
+        </div>
+
         <div className="mt-6 space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700">
