@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabase.js'
 import { api } from '../../lib/api.js'
 import { useAuth } from '../../providers/AuthProvider.jsx'
 
+
 export function LoginPage() {
   const navigate = useNavigate()
   const location = useLocation()
