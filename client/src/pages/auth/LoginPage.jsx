@@ -7,7 +7,7 @@ import { useAuth } from '../../providers/AuthProvider.jsx'
 export function LoginPage() {
   const navigate = useNavigate()
   const location = useLocation()
-  const { refreshProfile, getDefaultPath } = useAuth(
+  const { refreshProfile, getDefaultPath } = useAuth()
 
   const [collegeId, setCollegeId] = useState('')
   const [password, setPassword] = useState('')
